@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: Account Viewer API
+  version: 1.0.0
+paths:
+  /api/v1/plaid/create_link_token:
+    post:
+      summary: Create a Plaid Link token
+      description: >-
+        Creates a `link_token` which is used to initialize the Plaid Link
+        flow on the client-side.
+      responses:
+        '200':
+          description: Successfully created link token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  link_token:
+                    type: string
+                    description: The token to initialize Plaid Link.
+  /api/v1/plaid/exchange_public_token:
+    post:
+      summary: Exchange a public token for an access token
+      description: >-
+        Exchanges a `public_token` from Plaid Link for an `access_token`
+        that can be used to make API calls on behalf of the user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                public_token:
+                  type: string
+                  description: The public token from the Plaid Link flow.
+      responses:
+        '200':
+          description: Successfully exchanged token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+  /api/v1/report:
+    post:
+      summary: Get consolidated account report
+      description: >-
+        Retrieves the consolidated account report for the given items and
+        as-of date.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: A list of item_ids to include in the report.
+                as_of_date:
+                  type: string
+                  format: date
+                  description: The as-of date for the report.
+      responses:
+        '200':
+          description: The consolidated account report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+components:
+  schemas:
+    Report:
+      type: object
+      properties:
+        institutions:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstitutionReport'
+        grand_total:
+          type: number
+          format: double
+          description: The grand total of all account balances.
+    InstitutionReport:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the financial institution.
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        sub_total:
+          type: number
+          format: double
+          description: The sub-total of balances for this institution.
+    Account:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the account.
+        mask:
+          type: string
+          description: The last 4 digits of the account number.
+        balance:
+          type: number
+          format: double
+          description: The account balance.
+        balance_as_of:
+          type: string
+          format: date
+          description: The date of the balance.
