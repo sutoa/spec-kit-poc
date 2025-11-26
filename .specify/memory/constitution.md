@@ -2,20 +2,21 @@
 
 ## Core Principles
 
-### I. Component-Driven & Design System-Centric UI
-The user interface will be constructed from a library of reusable, independently testable components, managed and visualized using Storybook. A utility-first CSS framework like Tailwind CSS will be used for styling to ensure consistency, scalability, and a "sleek" aesthetic without custom CSS bloat.
+### I. Simplicity and Maintainability
+- Code must be clear, concise, and easy to understand.
+- Prioritize maintainability and long-term viability over short-term gains.
 
-### II. Decoupled Architecture & API-First Design
-The application will be split into two distinct parts: a frontend client and a backend API server. All communication between them will occur over a well-defined RESTful or GraphQL API. This separation allows for independent development, deployment, and scaling.
+### II. Test-Driven Development (TDD)
+- All new features and bug fixes must be accompanied by comprehensive tests.
+- Aim for high test coverage for critical components.
 
-### III. Comprehensive Automated Testing
-To ensure reliability and ease of maintenance, a multi-layered testing strategy is mandatory. This includes unit tests for individual functions and components (using Vitest/Jest & React Testing Library), integration tests for API endpoints, and end-to-end tests for critical user flows (using Playwright or Cypress).
+### III. User Experience (UX) Focus
+- Design decisions must prioritize a seamless and intuitive user experience.
+- Accessibility standards must be met for all user-facing components.
 
-### IV. Predictable State Management
-The frontend will utilize a centralized state management library (e.g., Zustand or Redux Toolkit) to handle global application state. This ensures data flows in a unidirectional and predictable manner, simplifying debugging and scaling the complexity of the UI.
-
-### V. Simplicity instead of Over Engineering. 
-An easy to maintain and grow codebase for the application is a MUST.
+### IV. Performance Optimization
+- Applications must be optimized for speed and responsiveness.
+- Performance bottlenecks should be identified and addressed proactively.
 
 ## Development Workflow
 
