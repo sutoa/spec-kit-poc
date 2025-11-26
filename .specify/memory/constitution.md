@@ -1,50 +1,32 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Account Viewer Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Component-Driven & Design System-Centric UI
+The user interface will be constructed from a library of reusable, independently testable components, managed and visualized using Storybook. A utility-first CSS framework like Tailwind CSS will be used for styling to ensure consistency, scalability, and a "sleek" aesthetic without custom CSS bloat.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Decoupled Architecture & API-First Design
+The application will be split into two distinct parts: a frontend client and a backend API server. All communication between them will occur over a well-defined RESTful or GraphQL API. This separation allows for independent development, deployment, and scaling.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Comprehensive Automated Testing
+To ensure reliability and ease of maintenance, a multi-layered testing strategy is mandatory. This includes unit tests for individual functions and components (using Vitest/Jest & React Testing Library), integration tests for API endpoints, and end-to-end tests for critical user flows (using Playwright or Cypress).
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Predictable State Management
+The frontend will utilize a centralized state management library (e.g., Zustand or Redux Toolkit) to handle global application state. This ensures data flows in a unidirectional and predictable manner, simplifying debugging and scaling the complexity of the UI.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Simplicity instead of Over Engineering. 
+An easy to maintain and grow codebase for the application is a MUST.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Development Workflow
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+All development will follow a trunk-based development model. Code changes are introduced through Pull Requests (PRs) from feature branches. Each PR must be reviewed and approved by at least one other developer before being merged. Automated CI/CD pipelines (using GitHub Actions) will be used to run linters, tests, and builds on every PR to maintain code quality.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Quality & Maintainability
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Code must adhere to a strict style guide enforced by Prettier and ESLint. All public APIs, complex business logic, and component props must be documented using JSDoc. The goal is to create a self-documenting, clean, and easily navigable codebase that can be scaled effectively.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution serves as the foundational guide for all technical decisions. Any proposed deviation must be documented in a Request for Comments (RFC), reviewed by the team, and formally approved before implementation. The guiding principle is to favor simplicity and adhere to these standards unless a compelling, long-term benefit for a deviation can be proven.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-11-26 | **Last Amended**: 2025-11-26
