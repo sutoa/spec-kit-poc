@@ -3,7 +3,7 @@
 **Feature Branch**: `001-financial-reporting-tool`  
 **Created**: 2025-11-26  
 **Status**: Draft  
-**Input**: User description: "I'm building a SLEEk-looking, modern web-based reporting utility for me to collect account information for all my accounts with various financial institutions and present them to me in a consolidate view. There's a main landing page with a left panel that allows me to specify the filter condition. The filter should have an as-of date field. It should also have a list of financial companies that I can choose to report from. There is a 'Report' button next to the as-of date. Once clicked, I should get the report in the right Panel with a consolidated view. The view should include account number, balance in dollar amount, date of the balance closest to the as-of date for each account. Accounts should be grouped by institution as I sometimes have multiple accounts with the same institute. There should be a sub total for institution and a grand total. I have the user ID and password for each of the institutions. But I need you to figure out how to log into those companies and grab the account info , via API calls. Institutions I have accounts include - Fidelity, UBS Security and Goldman Sachs 401K."
+**Input**: User description: "I'm building a SLEEk-looking, modern web-based reporting utility for me to collect account information for all my accounts with various financial institutions and present them to me in a consolidated view. There's a main landing page with a left panel that allows me to specify the filter condition. The filter should have an as-of date field. It should also have a list of financial companies that I can choose to report from. There is a 'Report' button next to the as-of date. Once clicked, I should get the report in the right Panel with a consolidated view. The view should include account number, balance in dollar amount, date of the balance closest to the as-of date for each account. Accounts should be grouped by institution as I sometimes have multiple accounts with the same institute. There should be a sub total for institution and a grand total. I have the user ID and password for each of the institutions. But I need you to figure out how to log into those companies and grab the account info , via API calls. Institutions I have accounts include - Fidelity (https://digital.fidelity.com/ftgw/digital/portfolio/positions), UBS Security (https://worklife.alight.com/ah-angular-afirst-web/#/web/ubsfinancialservicesinc./worklife-slp), and Goldman Sachs 401K (https://worklife.alight.com/ah-angular-afirst-web/#/web/goldmansachs/worklife-slp)."
 
 ## User Scenarios & Testing
 
@@ -58,7 +58,7 @@ As a user, I want to specify an "as-of" date for my report, so that I can view m
 
 -   **FR-001**: The system MUST provide a user interface consisting of a left filter panel and a right reporting panel.
 -   **FR-002**: The filter panel MUST contain a date picker for specifying an "as-of" date.
--   **FR-003**: The filter panel MUST display a multi-select list of supported financial institutions (Fidelity, UBS Security, Goldman Sachs 401K).
+-   **FR-003**: The filter panel MUST display a multi-select list of supported financial institutions (Fidelity, UBS Security, Goldman Sachs 401K). The URLs for these institutions are provided in the Input section.
 -   **FR-004**: The filter panel MUST include a "Report" button.
 -   **FR-005**: Upon clicking the "Report" button, the system MUST prompt the user for credentials (User ID and Password) for each selected financial institution. The system MUST NOT persistently store these credentials.
 -   **FR-006**: The system MUST connect to the selected financial institutions to retrieve account data. The primary method will be direct API integration. If direct API integration is not available or feasible for a given institution, web scraping will be used as a fallback.
@@ -71,7 +71,7 @@ As a user, I want to specify an "as-of" date for my report, so that I can view m
 ### Key Entities
 
 -   **User**: The individual interacting with the application.
--   **Financial Institution**: A supported entity like Fidelity, UBS Security, Goldman Sachs 401K.
+-   **Financial Institution**: A supported entity like Fidelity, UBS Security, Goldman Sachs 401K. URLs for these are in the input description.
 -   **Account**: A user's financial account held at a Financial Institution, characterized by Account Number, Balance, and Balance Date.
 -   **Credential**: User ID and Password required for authentication with a Financial Institution (provided on-the-fly).
 

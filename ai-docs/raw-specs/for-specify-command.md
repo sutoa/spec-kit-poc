@@ -1,4 +1,7 @@
 I'm building a SLEEk-looking, modern web-based reporting utility for me to collect account information for all my accounts with various financial institutions and present them to me in a consolidate view. 
 There's a main landing page with a left panel that allows me to specify the filter condition. The filter should have an as-of date field. It should also have a list of financial companies that I can choose to report from. There is a 'Report' button next to the as-of date. Once clicked, I should get the report in the right Panel with a consolidated view. The view should include account number, balance in dollar amount, date of the balance closest to the as-of date for each account. Accounts should be grouped by institution as I sometimes have multiple accounts with the same institute. There should be a sub total for institution and a grand total.
 I have the user ID and password for each of the institutions. But I need you to figure out how to log into those companies and grab the account info , via API calls.
-Institutions I have accounts include - Fidelity, UBS Security and Goldman Sachs 401K. 
+Institutions I have accounts include  
+- Fidelity https://digital.fidelity.com/ftgw/digital/portfolio/positions
+- UBS Security https://worklife.alight.com/ah-angular-afirst-web/#/web/ubsfinancialservicesinc./worklife-slp 
+- Goldman Sachs 401K https://worklife.alight.com/ah-angular-afirst-web/#/web/goldmansachs/worklife-slp
