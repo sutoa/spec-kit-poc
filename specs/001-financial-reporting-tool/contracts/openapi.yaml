@@ -1,17 +1,19 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: Account Viewer API
   version: 1.0.0
+  description: >-
+    API for the Consolidated Financial Account Viewer. Handles communication with the Plaid API and report generation.
+
 paths:
   /api/v1/plaid/create_link_token:
     post:
-      summary: Create a Plaid Link token
+      summary: Create a Plaid Link Token
       description: >-
-        Creates a `link_token` which is used to initialize the Plaid Link
-        flow on the client-side.
+        Creates and returns a `link_token`, which is required to initialize the Plaid Link flow on the frontend.
       responses:
         '200':
-          description: Successfully created link token
+          description: Successfully created the link token.
           content:
             application/json:
               schema:
@@ -19,63 +21,82 @@ paths:
                 properties:
                   link_token:
                     type: string
-                    description: The token to initialize Plaid Link.
+                    description: The one-time token to initialize Plaid Link.
+                    example: "link-sandbox-12345678-abcd-1234-abcd-1234567890ab"
+        '500':
+          description: Internal server error, likely an issue communicating with the Plaid API.
+
   /api/v1/plaid/exchange_public_token:
     post:
-      summary: Exchange a public token for an access token
+      summary: Exchange Public Token for an Access Token
       description: >-
-        Exchanges a `public_token` from Plaid Link for an `access_token`
-        that can be used to make API calls on behalf of the user.
+        Exchanges a short-lived `public_token` from a successful Plaid Link flow for a long-lived `access_token`.
+        The `access_token` is then encrypted and stored on the server.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - public_token
               properties:
                 public_token:
                   type: string
-                  description: The public token from the Plaid Link flow.
+                  description: The public token obtained from the Plaid Link flow.
       responses:
         '200':
-          description: Successfully exchanged token
+          description: Successfully exchanged the token and created an item.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                    example: true
+                  item_id:
+                    type: string
+                    description: The unique ID for the newly created item in our system.
+                  institution_name:
+                    type: string
+                    description: The name of the financial institution.
+        '400':
+          description: Bad request, e.g., missing public_token.
+        '500':
+          description: Internal server error.
+
   /api/v1/report:
     post:
-      summary: Get consolidated account report
+      summary: Generate a Consolidated Account Report
       description: >-
-        Retrieves the consolidated account report for the given items and
-        as-of date.
+        Retrieves the consolidated account report for the given item IDs and as-of date.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - item_ids
+                - as_of_date
               properties:
                 item_ids:
                   type: array
                   items:
                     type: string
-                  description: A list of item_ids to include in the report.
+                  description: A list of item IDs (from our system) to include in the report.
                 as_of_date:
                   type: string
                   format: date
-                  description: The as-of date for the report.
+                  description: The as-of date for the report (YYYY-MM-DD).
       responses:
         '200':
-          description: The consolidated account report
+          description: The consolidated account report.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Report'
+        '400':
+          description: Bad request, e.g., missing parameters.
+
 components:
   schemas:
     Report:
@@ -89,10 +110,11 @@ components:
           type: number
           format: double
           description: The grand total of all account balances.
+
     InstitutionReport:
       type: object
       properties:
-        name:
+        institution_name:
           type: string
           description: The name of the financial institution.
         accounts:
@@ -103,6 +125,15 @@ components:
           type: number
           format: double
           description: The sub-total of balances for this institution.
+        status:
+          type: string
+          enum: [succeeded, failed]
+          description: The status of data retrieval for this institution.
+        error_message:
+          type: string
+          nullable: true
+          description: An error message if data retrieval failed.
+
     Account:
       type: object
       properties:

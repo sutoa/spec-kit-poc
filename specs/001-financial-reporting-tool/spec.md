@@ -25,7 +25,7 @@ As a user, I want to see a combined and filterable view of all my financial acco
 
 ### Edge Cases
 
--   What happens when an institution selected by the user does not have an available direct API, and web scraping fails or returns incomplete data? The system should clearly indicate which institutions failed to retrieve data and why.
+-   What happens when an institution selected by the user does not have an available direct API, and web scraping fails or returns incomplete data? The system should present failed institutions in-line within the report, showing an error message in place of account data.
 -   How does the system handle invalid credentials entered by the user? The system should prompt for re-entry and provide clear error messages.
 -   What happens if no accounts are found for a selected institution? The institution should still be listed in the report with a clear indication of "No accounts found".
 -   What happens if the "as-of" date is far in the past or the future? The system should attempt to find the closest available balance date for historical data; for future dates, it should default to the most recent available data.
@@ -41,16 +41,19 @@ As a user, I want to see a combined and filterable view of all my financial acco
 -   **FR-005**: Upon clicking the "Report" button, the system MUST prompt the user for credentials (User ID and Password) for each selected financial institution. The system MUST NOT persistently store these credentials.
 -   **FR-006**: The system MUST connect to the selected financial institutions to retrieve account data. The primary method will be direct API integration. If direct API integration is not available or feasible for a given institution, web scraping will be used as a fallback.
 -   **FR-007**: The system MUST display a consolidated report in the right panel upon successful data retrieval.
--   **FR-008**: The report MUST list individual accounts, showing Account Number, Balance in dollar amount, and the Date of the Balance closest to the specified "as-of" date for each account.
+- **FR-008**: The report MUST list individual accounts, showing the masked Account Number, Balance in dollar amount, and the Date of the Balance closest to the specified "as-of" date for each account.
 -   **FR-009**: The report MUST group accounts by their respective financial institution.
 -   **FR-010**: The report MUST display a sub-total of balances for each institution group.
--   **FR-011**: The report MUST display a grand total of all balances from all selected institutions.
+- **FR-011**: The report MUST display a grand total of all balances from all selected institutions.
+- **FR-012**: The system MUST securely persist access tokens obtained from financial institutions (e.g., Plaid `access_token`) in an encrypted format within the backend database.
+- **FR-013**: The system MUST log data aggregation attempts with INFO level for successes, WARN level for partial failures, and ERROR level for complete failures.
+- **FR-014**: The system UI MUST adhere to Material Design principles to ensure a sleek, modern, and consistent user experience.
 
 ### Key Entities
 
 -   **User**: The individual interacting with the application.
 -   **Financial Institution**: A supported entity like Fidelity, UBS Security, Goldman Sachs 401K. URLs for these are in the input description.
--   **Account**: A user's financial account held at a Financial Institution, characterized by Account Number, Balance, and Balance Date.
+-   **Account**: A user's financial account held at a Financial Institution, characterized by a masked Account Number (e.g., last 4 digits), Balance, and Balance Date.
 -   **Credential**: User ID and Password required for authentication with a Financial Institution (provided on-the-fly).
 
 ## Success Criteria
@@ -70,3 +73,11 @@ As a user, I want to see a combined and filterable view of all my financial acco
 -   I will perform necessary research to identify the availability of direct APIs for Fidelity, UBS Security, and Goldman Sachs 401K.
 -   The "as-of" date functionality will aim to retrieve the closest available balance date from the institutions if an exact match is not possible.
 -   The application will run in a modern web browser environment.
+
+## Clarifications
+### Session 2025-11-26
+- Q: How should the application handle access tokens for financial institutions? → A: Persisted, encrypted in DB.
+- Q: When data retrieval for an institution fails, how should the failure be presented to the user? → A: In-line within report.
+- Q: For displaying account numbers, should the application store and use the full account number or only a masked version (e.g., last 4 digits)? → A: Masked version only.
+- Q: What level of detail is required for logging data aggregation attempts, successes, and failures? → A: INFO for successes, WARN/ERROR for failures.
+- Q: What specific UI/UX guidelines or design system should be followed to achieve a 'sleek and modern' look? → A: Material Design.

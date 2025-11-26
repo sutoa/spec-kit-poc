@@ -1,58 +1,35 @@
-# Research & Decisions
+# Research & Decisions: Financial Data Aggregation
 
-This document outlines the research findings and technical decisions for the Consolidated Financial Account Viewer feature, updated with the latest information about the target financial institutions.
+This document outlines the research findings and technical decisions for the method of connecting to financial institutions for the Consolidated Financial Account Viewer.
 
-## 1. Financial Data Aggregation
+## 1. Financial Data Aggregation Strategy
 
-**Decision**: Use a third-party financial data aggregation service. Plaid is the recommended choice due to its extensive documentation, broad institution support, and developer-friendly API.
+**Decision**: Use a third-party financial data aggregation service. Plaid is the recommended choice due to its extensive documentation, broad institution support (including those managed by Alight, which covers UBS and Goldman Sachs 401k from the spec), and developer-friendly API.
 
 **Rationale**:
-- The new information provided shows that both "UBS Security" and "Goldman Sachs 401K" are administered through Alight. Research confirms that Plaid has integrations with many Alight-managed accounts.
-- Using a data aggregator like Plaid is still the most robust and scalable approach, abstracting away the specifics of each institution.
-- Direct API access is not a viable primary strategy.
+- The user's request involves connecting to multiple, distinct financial institutions. Building and maintaining individual integrations or web scrapers for each is brittle, time-consuming, and complex.
+- A data aggregator like Plaid abstracts away the specifics of each institution's API or login process.
+- Plaid provides a secure "Link" module for handling user credentials, which aligns with the requirement not to store user passwords.
+- It provides a unified API for fetching account and balance information, simplifying the backend implementation significantly.
 
 **Risks & Mitigation**:
-- There is a risk that Plaid's integration with the specific Alight instances for UBS and Goldman Sachs may be unstable or unavailable.
-- **Mitigation**: The fallback strategy will be to use web scraping. Given that the Alight platform is a single-page application (SPA), this would require a browser automation tool like Playwright. This adds complexity and should only be pursued if the Plaid integration fails. For Fidelity, which does not use Alight, web scraping would also be the fallback.
+- **Risk**: Plaid's integration with a specific institution might be temporarily down or deprecated.
+- **Mitigation**: The application will handle this gracefully by reporting the failure for that specific institution in-line in the report, as clarified in the spec.
+- **Risk**: Plaid is a paid service.
+- **Mitigation**: For development, Plaid offers a free Sandbox environment. For production, the cost would need to be evaluated, but it is likely far less than the cost of developing and maintaining custom integrations.
 
-**Alternatives considered**:
-- **Direct API Integration**: Rejected due to lack of availability for individual users.
-- **Custom Web Scraping (Primary)**: Rejected as a primary strategy due to its brittle nature. It is retained as a fallback.
+## 2. Alternatives Considered
 
-## 2. Technology Stack
+### Alternative 1: Direct API Integration
 
-### Backend
+- **Description**: Connecting directly to each financial institution's official API.
+- **Rejected Because**: Most financial institutions do not offer public, developer-friendly APIs for individual customer data access. Those that do often have a prohibitive vetting process. This approach is not feasible.
 
-**Decision**: Python 3.11+ with FastAPI.
-**Rationale**:
-- FastAPI's asynchronous support is well-suited for handling API calls to Plaid.
-- The Python ecosystem provides excellent libraries for both interacting with Plaid (`plaid-python`) and for web scraping (`playwright`) if the fallback is needed.
+### Alternative 2: Custom Web Scraping
 
-### Frontend
-
-**Decision**: TypeScript with React, bootstrapped with Vite.
-**Rationale**:
-- React is a mature and popular choice for building dynamic user interfaces.
-- TypeScript provides type safety, which is valuable for an application handling financial data.
-- Vite offers a superior development experience.
-
-## 3. Data Caching
-
-**Decision**: No server-side caching of financial data in the initial version.
-**Rationale**:
-- Simplicity and ensuring data freshness are the main priorities.
-- The performance of Plaid's API will be monitored, and caching can be added as a future optimization if necessary.
-
-## 4. Testing Strategy
-
-### Backend (pytest)
-
-- **Unit Tests**: For all business logic and data transformations.
-- **Integration Tests**: Mocking the Plaid API and any web scraping targets.
-- **API Tests**: Testing the FastAPI endpoints.
-
-### Frontend (Jest/Vitest with React Testing Library)
-
-- **Unit Tests**: For individual components and logic.
-- **Integration Tests**: For component compositions and state management.
-- **E2E Tests**: (Out of scope for initial build) Could be added later with a tool like Playwright, which could also be used for scraping.
+- **Description**: Building custom web scrapers for each institution's web portal using a browser automation tool like Playwright or Selenium.
+- **Rejected Because**:
+    - **Brittleness**: Web scrapers break frequently due to minor UI changes on the target websites. This would create a significant maintenance burden.
+    - **Complexity**: Handling logins, multi-factor authentication (MFA), and navigating modern single-page applications (SPAs) for each site is highly complex.
+    - **Security**: Handling user credentials directly for scraping is a high-risk security practice.
+- **Note**: While rejected as a primary strategy, web scraping could have been a last-resort fallback if no aggregator existed. However, given Plaid's existence, this alternative is not recommended.
