@@ -7,9 +7,9 @@
 
 ## User Scenarios & Testing
 
-### User Story 1 - View Consolidated Account Summary (Priority: P1)
+### User Story 1 - View Consolidated Financial Report (Priority: P1)
 
-As a user, I want to see a combined view of all my financial accounts from selected institutions for a specific "as-of" date, so that I can understand my financial position at a glance.
+As a user, I want to see a combined and filterable view of all my financial accounts, so that I can understand my financial position at a glance.
 
 **Why this priority**: This is the core value proposition of the application, providing immediate insight into a user's aggregated financial data.
 
@@ -17,33 +17,11 @@ As a user, I want to see a combined view of all my financial accounts from selec
 
 **Acceptance Scenarios**:
 
-1.  **Given** I am on the main landing page, **When** I select one or more financial institutions, enter an "as-of" date, provide my credentials when prompted, and click the "Report" button, **Then** a consolidated report is displayed in the right panel.
-2.  **Given** a consolidated report is displayed, **When** I review the report, **Then** I see account number, balance, and date of balance closest to the "as-of" date for each account, grouped by institution with sub-totals and a grand total.
-
-### User Story 2 - Filter Accounts by Institution (Priority: P1)
-
-As a user, I want to be able to select specific financial institutions for which to generate a report, so that I can focus on particular parts of my financial portfolio.
-
-**Why this priority**: This allows users to customize their view and is integral to the reporting utility's functionality.
-
-**Independent Test**: Can be fully tested by selecting a subset of available institutions, generating a report, and confirming only accounts from the selected institutions are displayed.
-
-**Acceptance Scenarios**:
-
-1.  **Given** I am on the main landing page, **When** I select "Fidelity" and "UBS Security" from the list of institutions, provide credentials, and click "Report", **Then** the report panel displays accounts only from Fidelity and UBS Security.
-2.  **Given** I am on the main landing page, **When** I select "Goldman Sachs 401K", provide credentials, and click "Report", **Then** the report panel displays accounts only from Goldman Sachs 401K.
-
-### User Story 3 - Filter Accounts by Date (Priority: P1)
-
-As a user, I want to specify an "as-of" date for my report, so that I can view my account balances historically.
-
-**Why this priority**: Essential for historical analysis and understanding financial changes over time.
-
-**Independent Test**: Can be fully tested by selecting an institution, entering an historical "as-of" date, generating a report, and verifying that the balances and balance dates reflect the chosen date.
-
-**Acceptance Scenarios**:
-
-1.  **Given** I am on the main landing page, **When** I select an institution, enter "2024-01-01" as the "as-of" date, provide credentials, and click "Report", **Then** the report shows balances and their closest dates for 2024-01-01.
+1.  **Given** I am on the main landing page, **When** I select one or more financial institutions from a list, enter an "as-of" date, provide my credentials when prompted, and click the "Report" button, **Then** a consolidated report is displayed in the right panel.
+2.  **Given** a consolidated report is displayed, **When** I review the report, **Then** I see account number, balance, and date of balance closest to the "as-of" date for each account.
+3.  **Given** a consolidated report is displayed, **When** I review the report, **Then** accounts are grouped by institution with sub-totals and a grand total.
+4.  **Given** I am on the main landing page, **When** I select only "Fidelity" from the list of institutions and click "Report", **Then** the report panel displays accounts only from Fidelity.
+5.  **Given** I am on the main landing page, **When** I enter a historical "as-of" date, **Then** the report shows balances and their closest dates reflecting that historical date.
 
 ### Edge Cases
 

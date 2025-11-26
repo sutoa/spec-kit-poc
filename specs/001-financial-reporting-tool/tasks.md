@@ -103,8 +103,10 @@
 - [ ] T028 [P] Add loading indicators for all asynchronous operations in `frontend/src/pages/HomePage.tsx`
 - [ ] T029 [P] Implement comprehensive error handling and display user-friendly error messages in `frontend/src/pages/HomePage.tsx`
 - [ ] T030 [P] [Backend] Add structured logging for all API endpoints in `backend/src/api/`
-- [ ] T031 Review and add documentation (e.g., READMEs) for both `frontend/` and `backend/`
-- [ ] T032 Validate the entire workflow as described in `quickstart.md`
+- [ ] T031 [P] [Security] Review backend implementation to confirm no user credentials or long-lived tokens are stored locally or in logs
+- [ ] T032 Review and add documentation (e.g., READMEs) for both `frontend/` and `backend/`
+- [ ] T033 Validate the entire workflow as described in `quickstart.md`
+- [ ] T034 [P] [Testing] Add test to validate report generation is completed within the 60-second performance goal (SC-001)
 
 ---
 
