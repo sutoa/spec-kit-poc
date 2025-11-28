@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+dist/
+*.egg-info/
+
+# Node.js
+node_modules/
+dist/
+build/
+*.log
+.env*
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# IDEs
+.vscode/
+.idea/
+
+# Tests
+coverage/
+.pytest_cache/
+
+# Docker
+.dockerignore
+postgres_data/

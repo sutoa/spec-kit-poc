@@ -37,7 +37,7 @@ This guide provides the basic steps to get the Account Viewer application runnin
     PLAID_ENV=sandbox
 
     # Database Configuration
-    DATABASE_URL="postgresql://user:password@localhost:5432/account_viewer_db"
+    DATABASE_URL="postgresql://user:password@localhost:5432/account_viewer"
 
     # Encryption Key for Access Tokens (MUST be a 32-byte URL-safe base64-encoded string)
     # You can generate one using: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
@@ -52,7 +52,9 @@ This guide provides the basic steps to get the Account Viewer application runnin
 
 6.  **Run database migrations:**
     (Assuming Alembic is used, this step will be added once tasks are generated).
-    `alembic upgrade head`
+    ```bash
+    backend/venv/bin/alembic upgrade head
+    ```
 
 7.  **Run the backend server:**
     From the `backend` directory:

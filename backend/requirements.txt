@@ -1,0 +1,12 @@
+fastapi
+pydantic
+psycopg2-binary
+sqlalchemy
+alembic
+cryptography
+uvicorn
+black
+flake8
+python-dotenv
+plaid-python
+pytest
