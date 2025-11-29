@@ -49,8 +49,11 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 ### Edge Cases
 
 -   What happens when no account data is found for a selected institution for the specified "as-of date"?
+    **Clarification**: For accounts with no data for the as-of date, "N/A" or "No data available" will be displayed for balance and balance date.
 -   How does the system handle an API call failure for a financial institution (e.g., temporary outage, rate limiting)?
+    **Clarification**: The system will display the institution name in the report but show an error message (e.g., "Failed to retrieve data") instead of account details and totals.
 -   What if the "as-of date" is in the future or significantly older than available historical data?
+    **Clarification**: For accounts with no data on or before the as-of date, "N/A" or "No data available" will be displayed for balance and balance date.
 -   How does the system handle financial institutions that do not offer public APIs, or only offer paid APIs?
 
 ## Requirements
@@ -64,12 +67,13 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 -   **FR-005**: Filter panel MUST include a "Report" button to trigger report generation.
 -   **FR-006**: System MUST present a consolidated account report in the display area upon user request.
 -   **FR-007**: Consolidated report MUST group accounts by financial institution.
--   **FR-008**: Consolidated report MUST include account number, balance in USD, and the date of the **last known balance on or before** the "as-of date" for each account.
+-   **FR-008**: Consolidated report MUST include masked account number (e.g., "••••1234"), balance in USD (or "N/A" if no data), and the date of the **last known balance on or before** the "as-of date" for each account (or "N/A" if no data).
 -   **FR-009**: Consolidated report MUST display a sub-total for each financial institution group.
 -   **FR-010**: Consolidated report MUST display a grand total for all accounts.
--   **FR-011**: System MUST securely handle user credentials for financial institutions by prompting the user for their credentials for each data retrieval session and passing them directly to a third-party aggregation service without storing them within the application.
+-   **FR-011**: System MUST securely handle user credentials for financial institutions by leveraging the third-party aggregator's (SnapTrade) secure authentication flow, where the user authenticates directly with the aggregator via a redirect, and the aggregator manages the connection securely.
 -   **FR-012**: System MUST retrieve account information by utilizing a third-party aggregation service (e.g., Plaid, SnapTrade) which handles connections and authentication with financial institutions.
 -   **FR-013**: System SHOULD prioritize free API services for data retrieval whenever possible.
+-   **FR-014**: System MUST log all incoming requests and outgoing responses for auditing purposes.
 
 ### Assumptions
 
@@ -77,7 +81,7 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 
 ### Key Entities
 
--   **Account**: Represents a financial account. Key attributes include: account number, current balance, date of balance, and associated institution.
+-   **Account**: Represents a financial account. Key attributes include: masked account number (e.g., "••••1234"), current balance, date of balance, and associated institution.
 -   **Institution**: Represents a financial institution (e.g., Fidelity, Vanguard). Key attributes include: name, and associated user credentials for API access.
 -   **Report**: A consolidated view of account information, generated based on user-defined filters.
 
@@ -89,3 +93,14 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 -   **SC-002**: The consolidated report accurately displays account numbers, balances, and balance dates, with correct sub-totals and a grand total for 100% of reported accounts.
 -   **SC-003**: The system successfully connects and retrieves data from at least 3 specified financial institutions (e.g., Fidelity, Vanguard, TRow Price) using their APIs.
 -   **SC-004**: The system minimizes the use of paid APIs for data retrieval, favoring solutions that offer the lowest cost, including free tiers of direct APIs, Open Banking APIs, or cost-effective third-party aggregation services (like Plaid or SnapTrade) for at least 80% of integrated institutions.
+
+## Clarifications
+
+### Session 2025-11-28
+- Q: How should the report display an institution if its data cannot be fetched (e.g., API is down or credentials failed)? → A: Display the institution name in the report but show an error message (e.g., "Failed to retrieve data") instead of account details and totals.
+- Q: How should the application handle authentication for data retrieval sessions? → A: Leverage the third-party aggregator's (SnapTrade) secure authentication flow, where the user authenticates directly with the aggregator via a redirect, and the aggregator manages the connection securely.
+- Q: What should be displayed for an account if there is no balance available on or before the selected "as-of date"? → A: Display "N/A" or "No data available" for the balance and balance date for that specific account.
+- Q: How should account numbers be displayed in the report? → A: Mask the account number (e.g., "••••1234").
+- Q: What level of logging is required for the application? → A: Log all requests and responses for auditing purposes.
+
+## Requirements
