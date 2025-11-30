@@ -1,67 +1,74 @@
-# Quickstart Guide
+# Quickstart: Account Reporting Utility
 
-This guide provides the basic steps to get the Account Reporting Utility up and running on a local development machine.
+This guide provides the steps to set up and run the project locally for development.
 
 ## Prerequisites
 
--   **Node.js**: v18 or later
--   **Python**: 3.11 or later
--   **`pip` and `venv`** for Python package management
+-   Python 3.11+
+-   Node.js 18+ and npm
+-   An account with SnapTrade to get API credentials.
 
 ## 1. Backend Setup
 
-The backend is a Python application powered by FastAPI.
+### Installation
 
-```bash
-# Navigate to the backend directory
-cd backend
+1.  **Navigate to the backend directory:**
+    ```bash
+    cd backend
+    ```
 
-# Create a virtual environment
-python3 -m venv venv
+2.  **Create and activate a virtual environment:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
 
-# Activate the virtual environment
-source venv/bin/activate
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+    *(Note: `requirements.txt` will be created during implementation)*
 
-# Install dependencies (a requirements.txt will be created)
-pip install -r requirements.txt
-```
+### Configuration
+
+1.  Create a `.env` file in the `backend` directory.
+2.  Add your SnapTrade API credentials to the `.env` file:
+    ```
+    SNAPTRADE_CLIENT_ID=your_client_id
+    SNAPTRADE_CLIENT_SECRET=your_client_secret
+    ```
 
 ### Running the Backend
 
-With the virtual environment activated:
-
-```bash
-# Run the FastAPI development server
-uvicorn src.main:app --reload
-```
-
-The API will be available at `http://127.0.0.1:8000`.
+1.  **Start the FastAPI server:**
+    ```bash
+    uvicorn app.main:app --reload
+    ```
+    The API will be available at `http://127.0.0.1:8000`.
 
 ## 2. Frontend Setup
 
-The frontend is a React application built with Vite.
+### Installation
 
-```bash
-# Navigate to the frontend directory
-cd frontend
+1.  **Navigate to the frontend directory:**
+    ```bash
+    cd frontend
+    ```
 
-# Install dependencies
-npm install
-```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+    *(Note: The React project will be set up during implementation)*
 
 ### Running the Frontend
 
-```bash
-# Start the Vite development server
-npm run dev
-```
+1.  **Start the development server:**
+    ```bash
+    npm start
+    ```
+    The application will be available at `http://localhost:3000`.
 
-The web application will be accessible at `http://localhost:5173` (or another port if 5173 is in use).
+## 3. Database
 
-## 3. First-Time Use
-
-1.  Start both the backend and frontend servers as described above.
-2.  Open your web browser to the frontend URL.
-3.  On the main page, you will see a list of available financial institutions.
-4.  To connect to an institution, you will need to click a "Connect" button, which will redirect you to SnapTrade's secure authentication portal.
-5.  Once connected, you can navigate back to the reporting page, select the institutions you've connected, choose an as-of date, and generate a report.
+The backend uses SQLite for local development. The database file (`development.db`) will be created automatically in the `backend` directory when the application is first run.

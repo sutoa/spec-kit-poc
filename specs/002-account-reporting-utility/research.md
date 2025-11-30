@@ -1,51 +1,40 @@
-# Research & Decisions
+# Research & Decisions: Account Reporting Utility
 
-This document outlines the research findings and subsequent technical decisions made for the Account Reporting Utility.
+This document summarizes the research and decisions made during Phase 0 of the planning process.
 
-## 1. Data Aggregation Service: Plaid vs. SnapTrade
+## 1. Financial Data Aggregator
 
-### Research Objective
-Per the feature specification, a third-party data aggregation service is required to connect to financial institutions. The primary constraint is to minimize cost (FR-013). The two candidates considered were Plaid and SnapTrade.
+The core of this project relies on a third-party service to aggregate financial data. The options considered were SnapTrade, Plaid, and Yodlee.
 
-### Findings
+### Comparison
 
-#### Plaid
-- **Pricing Model**: Complex, "pay-as-you-go" model with costs broken down by product (e.g., Auth, Balance, Transactions).
-- **Estimated Cost for this Use Case**:
-    - **Auth** (one-time, per institution): ~$0.30 - $1.00
-    - **Balance** (per request): ~$0.30
-    - To get the required data (account number, balance), it would likely require an initial 'Auth' connection and then periodic 'Balance' calls. For 6 institutions, this could be a few dollars upfront and ongoing costs for data freshness.
-- **Free Tier**: Plaid offers a free Sandbox environment for development but does not offer a free tier for production usage with live data.
-
-#### SnapTrade
-- **Pricing Model**: Simple, user-based subscription model.
-- **Free Plan**:
-    - **Cost**: $0
-    - **Features**: Up to 5 brokerage connections, access to real-time data for positions, orders, and balances.
-- **Pay-as-you-go Plan**:
-    - **Cost**: $2 per connected user per month.
-    - **Features**: Unlimited brokerage connections, unlimited API requests.
+| Criteria | SnapTrade | Plaid | Yodlee |
+| :--- | :--- | :--- | :--- |
+| **Institution Coverage** | Strong focus on investment/brokerage accounts. Covers most requested institutions like Fidelity and other brokerages. | Excellent coverage of US banks and financial institutions (>12,000). | Most comprehensive global coverage, including banks and investments (>17,000). |
+| **Pricing Model** | **Ideal for personal use.** Free tier for up to 5 connections. "Pay as you go" is $2/user/month. | Expensive for production. Limited free calls. Pay-per-call pricing with monthly minimums (~$500). | Enterprise-focused and most expensive. Very limited free tier. High scaling costs. |
+| **Ease of Integration** | Good. Provides a React SDK for simple, secure iframe-based integration. | Very good. Excellent documentation and developer tools. | More complex, enterprise-oriented API. |
 
 ### Decision: SnapTrade
 
 **Rationale**:
-SnapTrade's **Free Plan** is the most cost-effective solution and aligns perfectly with the primary constraint of minimizing costs.
 
-- The plan allows for up to 5 connections, which nearly covers the user's initial list of 6 institutions. This is acceptable for an MVP.
-- The availability of real-time balance data is sufficient for the "as-of date" reporting requirement.
-- Should the 5-connection limit be a significant issue, the $2/month "Pay-as-you-go" plan is a predictable and still very low-cost alternative.
+1.  **Cost-Effective**: SnapTrade's free tier for up to 5 connections directly meets the user's critical requirement to minimize costs for a personal utility. This is the most significant deciding factor.
+2.  **Aligned Coverage**: Its focus on investment and brokerage accounts aligns well with the majority of the institutions specified by the user (Fidelity, Vanguard, etc.).
+3.  **Simple Integration**: The availability of a React SDK provides a straightforward and secure method for integrating the connection portal into our chosen frontend stack.
 
-This approach directly satisfies **SC-004** by selecting the lowest-cost option available.
+While Plaid and Yodlee offer wider institution coverage, their pricing models are prohibitive for a personal-use project and are better suited for commercial applications.
 
-## 2. Technical Stack Confirmation
+## 2. SnapTrade Connection Method
 
-### Research Objective
-Confirm the technology stack based on project goals and user requests.
+As per the user's request, the SnapTrade connection portal documentation was reviewed.
 
-### Findings & Decisions
+-   **Options Considered**: Redirect, iFrame, React SDK.
+-   **Decision**: Use the **SnapTrade React SDK**.
+-   **Rationale**: The SDK provides the most seamless user experience by keeping the user within the application. It simplifies development by handling the iFrame implementation and providing clear callbacks for success, error, and other events, which aligns with our goal of simplicity and maintainability.
 
-- **Backend**: **Python 3.11+ with FastAPI**. This choice aligns with the project's existing (though minimal) backend structure and provides a modern, high-performance framework for building the API.
-- **Frontend**: **React with Vite and TypeScript**. This meets the user's request for a "SLEEk-looking, modern" application. Vite provides a fast development experience, and TypeScript adds valuable type safety.
-- **Database**: **In-memory SQLite**. The user requested an "H2 in-mem database". Since H2 is a Java database, the Python equivalent is an in-memory SQLite database. This honors the user's intent for a simple, non-persistent database for the MVP, eliminating the need for a separate database server.
+## 3. Application Stack Best Practices
 
-All "NEEDS CLARIFICATION" items from the `plan.md` are now resolved.
+-   **Frontend/Backend Interaction**: A standard token-based authentication mechanism (e.g., JWT) will be used. The frontend will include the token in the Authorization header for all API requests to the backend. The backend will handle CORS to allow requests from the frontend's domain.
+-   **Data Caching**: To meet the performance requirement for fast refreshes (`<3s`), the backend will implement a caching layer.
+    -   **Strategy**: An in-memory cache (like a Python dictionary or a more robust library like `cachetools`) will be used to store the results of API calls to the aggregator for a short duration (e.g., 5-10 minutes).
+    -   **Justification**: This avoids making expensive, slow network calls to the aggregator on every single refresh, significantly improving responsiveness for the user while staying within the free-tier limits of the aggregator.

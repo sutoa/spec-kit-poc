@@ -1,74 +1,76 @@
 # Implementation Plan: Account Reporting Utility
 
-**Branch**: `002-account-reporting-utility` | **Date**: 2025-11-28 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/Users/tongsu/Documents/AI Ambitions/account-viewer/specs/002-account-reporting-utility/spec.md`
+This document outlines the technical plan for implementing the Account Reporting Utility feature, as specified in `spec.md`.
 
-## Summary
+## 1. Technical Context
 
-This plan outlines the implementation of a web-based utility for consolidating financial account information from various institutions. The primary goal is to provide a user with a consolidated view of their account balances from institutions like Fidelity, Vanguard, etc. The system will use a third-party service like Plaid or SnapTrade to fetch account data, prioritizing the most cost-effective solution. For the MVP, the application will use an in-memory database for simplicity. The feature specification has been clarified to handle error states, authentication flows, and data presentation details.
+This section defines the architectural approach and technology stack for the project.
 
-## Technical Context
+-   **Architectural Approach**: A monolithic repository containing a `frontend` React SPA and a `backend` Python REST API. The backend will manage business logic, database interactions, and communication with a third-party financial data aggregator. The frontend will present the user interface for the dashboard and connection management.
 
-**Language/Version**: Python 3.11+ (Backend), TypeScript/ES2022 (Frontend)
-**Primary Dependencies**:
-  - **Backend**: FastAPI, Uvicorn, SQLAlchemy
-  - **Frontend**: React (with Vite), TailwindCSS
-  - **Data Aggregation**: Plaid or SnapTrade (NEEDS CLARIFICATION: Cost analysis required)
-**Storage**: SQLite (in-memory, as a stand-in for the user-requested H2 database in a Python environment)
-**Testing**: `pytest` (Backend), `jest` & React Testing Library (Frontend)
-**Target Platform**: Modern Web Browsers (Chrome, Firefox, Safari)
-**Project Type**: Web Application (Backend API + Frontend SPA)
-**Performance Goals**: Generate reports for up to 5 institutions in under 5 seconds.
-**Constraints**: Minimize costs associated with third-party data aggregation APIs. Securely handle credentials by not storing them. Log all requests and responses for auditing.
-**Scale/Scope**: Single-user application, connecting to a small, predefined list of financial institutions.
+-   **Frontend**:
+    -   **Framework**: React with TypeScript
+    -   **Styling**: Material-UI (MUI) for a modern and sleek component library.
+    -   **State Management**: React Context or Zustand for managing application state.
 
-## Constitution Check
+-   **Backend**:
+    -   **Framework**: Python with FastAPI for a high-performance REST API.
+    -   **Data Validation**: Pydantic (built into FastAPI).
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+-   **Database**:
+    -   **Development**: SQLite for simplicity and ease of setup.
+    -   **Production**: Can be migrated to a more robust database like PostgreSQL if needed.
 
-| Principle | Status | Notes |
-|---|---|---|
-| I. Simplicity and Maintainability | Pass | The proposed stack (FastAPI, React) is modern and promotes clean architecture. An in-memory DB simplifies the MVP. |
-| II. Test-Driven Development (TDD) | Pass | `pytest` and `jest` will be used to write tests for all new functionality. |
-| III. User Experience (UX) Focus | Pass | The goal is a "SLEEk-looking, modern" UI. TailwindCSS will help achieve this. The spec now has clear UX guidance for error states. |
-| IV. Performance Optimization | Pass | Performance goals are defined and the tech stack is capable of meeting them. |
+-   **Financial Data Aggregation**:
+    -   **Primary Choice**: [NEEDS CLARIFICATION: Research which aggregator (SnapTrade, Plaid, Yodlee) best fits the requirements for cost, institution coverage, and ease of use.]
 
-All gates pass.
+## 2. Constitution Check
 
-## Project Structure
+-   **Simplicity and Maintainability**: The chosen stack (React, FastAPI) promotes clean, modern, and maintainable code. The architecture is straightforward.
+-   **Test-Driven Development (TDD)**: Both frontend (with Jest/React Testing Library) and backend (with Pytest) have mature testing frameworks available. Tests will be required for all new functionality.
+-   **User Experience (UX) Focus**: The choice of React with MUI allows for a highly interactive and polished user experience.
+-   **Performance Optimization**: FastAPI is known for its high performance. Frontend performance will be monitored, and the spec includes performance-related success criteria.
 
-### Documentation (this feature)
+**Gate Check**: No constitutional violations identified at this stage.
 
-```text
-specs/002-account-reporting-utility/
-├── plan.md              # This file
-├── research.md          # Phase 0 output
-├── data-model.md        # Phase 1 output
-├── quickstart.md        # Phase 1 output
-├── contracts/           # Phase 1 output
-└── tasks.md             # Phase 2 output (/speckit.tasks command)
-```
+## 3. Phase 0: Outline & Research
 
-### Source Code (repository root)
+This phase focuses on resolving the "NEEDS CLARIFICATION" items from the technical context. The results will be documented in `research.md`.
 
-```text
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+-   **Task 1**: Research and compare financial data aggregators (SnapTrade, Plaid, Yodlee) based on the following criteria:
+    -   **Institution Coverage**: Support for Fidelity, Vanguard, Janus, TRowe Price, UBS, and Goldman Sachs 401K.
+    -   **Pricing**: Emphasis on free or low-cost tiers for personal use.
+    -   **API & Documentation**: Ease of integration and quality of developer documentation.
+    -   **Connection Method**: Analyze the best approach for implementing the connection portal, specifically for SnapTrade as requested (`https://docs.snaptrade.com/docs/implement-connection-portal`).
 
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-```
+-   **Task 2**: Research best practices for building an application with a React frontend and a FastAPI backend, focusing on:
+    -   Project structure.
+    -   CORS (Cross-Origin Resource Sharing) management.
+    -   Authentication flow between frontend and backend.
 
-**Structure Decision**: A standard monorepo with a `backend` and `frontend` directory is appropriate for this web application. This aligns with the existing folder structure and separates concerns cleanly.
+-   **Task 3**: Research best practices for securely caching financial data retrieved from the aggregator to meet the performance requirements for subsequent refreshes.
 
-## Complexity Tracking
+## 4. Phase 1: Design & Contracts
 
-No violations to the constitution were identified.
+Based on the research, this phase will produce the core design artifacts.
+
+-   **Data Model (`data-model.md`)**: Define the database schema for `User`, `Connection`, and `Account` entities.
+-   **API Contracts (`contracts/openapi.yaml`)**: Create an OpenAPI 3.0 specification for the backend REST API.
+-   **Quickstart (`quickstart.md`)**: A guide to set up and run the project locally.
+
+## 5. Phase 2: Implementation & Testing
+
+This phase involves writing the code, but the detailed task breakdown will be generated by a separate command after the plan is approved.
+
+-   **Backend**:
+    -   Set up FastAPI application.
+    -   Implement API endpoints defined in `openapi.yaml`.
+    -   Integrate with the chosen financial data aggregator.
+    -   Implement database models and business logic.
+-   **Frontend**:
+    -   Set up React application.
+    -   Build UI components for the Dashboard and Connections pages.
+    -   Implement state management and API client to communicate with the backend.
+-   **Testing**:
+    -   Write unit and integration tests for both frontend and backend.
+    -   Perform end-to-end testing to verify user scenarios.

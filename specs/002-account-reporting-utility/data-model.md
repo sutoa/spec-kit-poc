@@ -1,134 +1,49 @@
-# Data Model
+# Data Model: Account Reporting Utility
 
-This document defines the data structures for the Account Reporting Utility, based on the entities identified in the feature specification.
+This document defines the database schema for the application.
 
-## 1. Core Entities
+## 1. User
 
-### 1.1. Institution
+Represents a user of the application.
 
-Represents a financial institution that the user has an account with.
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `id` | INTEGER | Primary Key |
+| `username` | TEXT | The user's unique username. |
+| `hashed_password` | TEXT | The user's hashed password. |
+| `created_at` | TIMESTAMP | The timestamp when the user was created. |
 
--   **`id`**: `string` (unique identifier, e.g., "fidelity")
--   **`name`**: `string` (display name, e.g., "Fidelity")
--   **`logo_url`**: `string` (Optional, URL to the institution's logo)
+## 2. Connection
 
-**Example**:
-```json
-{
-  "id": "fidelity",
-  "name": "Fidelity",
-  "logo_url": "https://example.com/logos/fidelity.png"
-}
-```
+Represents a user's connection to a financial institution via the SnapTrade aggregator.
 
-### 1.2. Account
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `id` | INTEGER | Primary Key |
+| `user_id` | INTEGER | Foreign Key to the `User` table. |
+| `snaptrade_connection_id` | TEXT | The unique ID for this connection from SnapTrade. |
+| `institution_name` | TEXT | The name of the financial institution. |
+| `status` | TEXT | The current status of the connection (e.g., 'active', 'error'). |
+| `created_at` | TIMESTAMP | The timestamp when the connection was established. |
 
-Represents a single financial account held at an Institution.
+## 3. Account
 
--   **`id`**: `string` (unique identifier for the account)
--   **`institution_id`**: `string` (foreign key to `Institution.id`)
--   **`account_number_masked`**: `string` (masked account number, e.g., "••••1234")
--   **`balance`**: `number | null` (the monetary value of the account, or null if not available)
--   **`balance_date`**: `string | null` (ISO 8601 date string, e.g., "2025-11-28", or null if not available)
+Represents a specific financial account retrieved from a connection. This data is cached and not intended to be the permanent source of truth.
 
-**Example**:
-```json
-{
-  "id": "acc_123xyz",
-  "institution_id": "fidelity",
-  "account_number_masked": "••••5678",
-  "balance": 12345.67,
-  "balance_date": "2025-11-27"
-}
-```
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `id` | INTEGER | Primary Key |
+| `connection_id` | INTEGER | Foreign Key to the `Connection` table. |
+| `snaptrade_account_id` | TEXT | The unique ID for this account from SnapTrade. |
+| `masked_account_number` | TEXT | The masked account number (e.g., '...1234'). |
+| `balance` | REAL | The account balance. |
+| `currency` | TEXT | The currency of the balance (e.g., 'USD'). |
+| `as_of_date` | TIMESTAMP | The date the balance was recorded by the institution. |
+| `last_updated` | TIMESTAMP | The timestamp when this account data was last fetched. |
 
-## 2. Report Structures
+## Relationships
 
-These are not persistent database models but represent the data structures used in the API and frontend to display reports.
-
-### 2.1. ReportRequest
-
-Represents the user's filter criteria for generating a report.
-
--   **`as_of_date`**: `string` (ISO 8601 date string, e.g., "2025-11-28")
--   **`institution_ids`**: `string[]` (list of institution IDs to include in the report)
-
-**Example**:
-```json
-{
-  "as_of_date": "2025-11-28",
-  "institution_ids": ["fidelity", "vanguard"]
-}
-```
-
-### 2.2. Report
-
-Represents the consolidated report returned to the user.
-
--   **`grand_total`**: `number`
--   **`institutions`**: `ReportInstitution[]` (list of institution-specific report groups)
-
-**Example**:
-```json
-{
-  "grand_total": 78345.67,
-  "institutions": [
-    {
-      "id": "fidelity",
-      "name": "Fidelity",
-      "sub_total": 12345.67,
-      "accounts": [
-        {
-          "account_number_masked": "••••5678",
-          "balance": 12345.67,
-          "balance_date": "2025-11-27"
-        }
-      ],
-      "error": null
-    },
-    {
-      "id": "vanguard",
-      "name": "Vanguard",
-      "sub_total": 66000.00,
-      "accounts": [
-        {
-          "account_number_masked": "••••1111",
-          "balance": 25000.00,
-          "balance_date": "2025-11-26"
-        },
-        {
-          "account_number_masked": "••••2222",
-          "balance": 41000.00,
-          "balance_date": "2025-11-28"
-        }
-      ],
-      "error": null
-    },
-    {
-        "id": "janus",
-        "name": "Janus",
-        "sub_total": 0,
-        "accounts": [],
-        "error": "Failed to retrieve data"
-    }
-  ]
-}
-```
-
-### 2.3. ReportInstitution
-
-A sub-structure within the `Report` that groups accounts by institution.
-
--   **`id`**: `string`
--   **`name`**: `string`
--   **`sub_total`**: `number`
--   **`accounts`**: `ReportAccount[]`
--   **`error`**: `string | null` (An error message if data retrieval failed for this institution)
-
-### 2.4. ReportAccount
-
-A sub-structure within `ReportInstitution` representing a single account's data for the report.
-
--   **`account_number_masked`**: `string`
--   **`balance`**: `number | "N/A"`
--   **`balance_date`**: `string | "N/A"`
+-   A `User` can have many `Connection`s.
+-   A `Connection` belongs to one `User`.
+-   A `Connection` can have many `Account`s.
+-   An `Account` belongs to one `Connection`.
