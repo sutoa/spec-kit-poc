@@ -22,7 +22,7 @@ This section defines the architectural approach and technology stack for the pro
     -   **Production**: Can be migrated to a more robust database like PostgreSQL if needed.
 
 -   **Financial Data Aggregation**:
-    -   **Primary Choice**: [NEEDS CLARIFICATION: Research which aggregator (SnapTrade, Plaid, Yodlee) best fits the requirements for cost, institution coverage, and ease of use.]
+    -   **Primary Choice**: SnapTrade. This decision is based on the research documented in `research.md`, which concluded its free tier and focus on investment accounts are the best fit for this project's requirements.
 
 ## 2. Constitution Check
 
