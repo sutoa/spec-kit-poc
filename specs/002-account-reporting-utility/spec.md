@@ -92,11 +92,14 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 -   **FR-026**: The application MUST adhere to the Principle of Least Privilege by requesting only essential account information (balance amounts and their associated as-of dates) from SnapTrade.
 -   **FR-027**: The list of financial institutions on the 'Connections' page MUST be sorted alphabetically by institution name, with all connected institutions appearing before disconnected institutions.
 -   **FR-028**: The 'actual as-of date' displayed on the dashboard for account balances MUST use the `YYYY-MM-DD` format (e.g., `2025-11-30`).
+-   **FR-029**: While dashboard data is being loaded, the UI MUST display a skeleton loader that mimics the final report table layout.
+-   **FR-030**: All application data, especially sensitive user and financial information, MUST be encrypted in transit using TLS 1.2+ and encrypted at rest within the database.
 
 ### Out of Scope / Post-MVP
 
 -   A list of checkboxes for institutions in the dashboard filter section will be implemented post-MVP. For the MVP, the dashboard will report on all connected institutions.
 -   API rate limiting (e.g., per-user or IP-based limits) will be deferred to a future release.
+-   Validating the authenticity of SnapTrade callbacks (e.g., via signature checking) is deferred to a future release. **[CRITICAL RISK - ACCEPTED]**: This introduces a security vulnerability where a malicious actor could spoof callback requests.
 
 ### Assumptions
 
@@ -132,6 +135,7 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 - Q: What is the explicit scope of data we should request from SnapTrade? → A: Request only account information that consists of balance in USD amount, the as-of date of the balance.
 - Q: How should the list of financial institutions on the 'Connections' page be sorted? → A: Alphabetically by institution name, with connected institutions listed first.
 - Q: What date format should be used when displaying the 'actual as-of date' on the dashboard? → A: `YYYY-MM-DD`.
+- Q: How should the authenticity of callbacks from SnapTrade be validated? → A: No explicit validation is required for the MVP. The user accepts the associated security risk for the initial release.
 
 ### Session 2025-11-28
 - Q: How should the report display an institution if its data cannot be fetched (e.g., API is down or credentials failed)? → A: Display the institution name in the report but show an error message (e.g., "Failed to retrieve data") instead of account details and totals.
