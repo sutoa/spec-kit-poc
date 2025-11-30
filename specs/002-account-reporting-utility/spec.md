@@ -89,10 +89,14 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 -   **FR-023**: The application MUST utilize secure HTTP headers, including a strict Content Security Policy (CSP), to mitigate XSS and other injection attacks.
 -   **FR-024**: If cookies are used for session management, they MUST be configured with `HttpOnly`, `Secure`, and `SameSite=Strict` flags.
 -   **FR-025**: For the MVP, the application MUST be designed for desktop browsers only; mobile and tablet support are explicitly out of scope.
+-   **FR-026**: The application MUST adhere to the Principle of Least Privilege by requesting only essential account information (balance amounts and their associated as-of dates) from SnapTrade.
+-   **FR-027**: The list of financial institutions on the 'Connections' page MUST be sorted alphabetically by institution name, with all connected institutions appearing before disconnected institutions.
+-   **FR-028**: The 'actual as-of date' displayed on the dashboard for account balances MUST use the `YYYY-MM-DD` format (e.g., `2025-11-30`).
 
 ### Out of Scope / Post-MVP
 
 -   A list of checkboxes for institutions in the dashboard filter section will be implemented post-MVP. For the MVP, the dashboard will report on all connected institutions.
+-   API rate limiting (e.g., per-user or IP-based limits) will be deferred to a future release.
 
 ### Assumptions
 
@@ -124,6 +128,10 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 - Q: What should the lifecycle for user authentication tokens (JWTs) be? → A: Short-lived access tokens (e.g., 15 minutes) with a long-lived refresh token mechanism.
 - Q: What are the primary mechanisms we should implement to prevent CSRF and XSS vulnerabilities in the application? → A: A combination of CSRF tokens, input/output sanitization, and secure cookie/token handling (including HttpOnly cookies and a Content Security Policy).
 - Q: What is the requirement for responsive design on smaller screens (tablet and mobile)? → A: Desktop Only. Mobile and tablet support are not required for the MVP and can be deferred.
+- Q: Should we implement rate limiting on the API, and if so, what should the limits be? → A: No rate limiting required for the MVP. Defer this requirement for a future release.
+- Q: What is the explicit scope of data we should request from SnapTrade? → A: Request only account information that consists of balance in USD amount, the as-of date of the balance.
+- Q: How should the list of financial institutions on the 'Connections' page be sorted? → A: Alphabetically by institution name, with connected institutions listed first.
+- Q: What date format should be used when displaying the 'actual as-of date' on the dashboard? → A: `YYYY-MM-DD`.
 
 ### Session 2025-11-28
 - Q: How should the report display an institution if its data cannot be fetched (e.g., API is down or credentials failed)? → A: Display the institution name in the report but show an error message (e.g., "Failed to retrieve data") instead of account details and totals.
