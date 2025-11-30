@@ -83,6 +83,12 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 -   **FR-017**: The 'Refresh' button on the dashboard MUST be disabled if no institutions are connected.
 -   **FR-018**: When a connection attempt fails, the system MUST display a specific error message to the user, and the institution's status in the Connections list MUST be updated to reflect the failure.
 -   **FR-019**: The dashboard report MUST display actual balance amounts and institution names as retrieved from the connected financial institutions.
+-   **FR-020**: The system MUST implement a JWT-based authentication system using short-lived access tokens (e.g., 15 minutes expiration) and long-lived refresh tokens. The backend MUST generate and validate these tokens, and the frontend MUST manage their refresh securely.
+-   **FR-021**: The backend MUST implement anti-CSRF token validation for all state-changing API endpoints.
+-   **FR-022**: The system MUST sanitize all user-provided input and escape all data before rendering it in the UI to prevent XSS attacks.
+-   **FR-023**: The application MUST utilize secure HTTP headers, including a strict Content Security Policy (CSP), to mitigate XSS and other injection attacks.
+-   **FR-024**: If cookies are used for session management, they MUST be configured with `HttpOnly`, `Secure`, and `SameSite=Strict` flags.
+-   **FR-025**: For the MVP, the application MUST be designed for desktop browsers only; mobile and tablet support are explicitly out of scope.
 
 ### Out of Scope / Post-MVP
 
@@ -115,6 +121,9 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 - Q: What exactly does "actual as-of date" mean for an account balance in the report? → A: The closest date of the account information available from the institution before or on the as-of date provided in the filter.
 - Q: Should subsequent refreshes of the dashboard report have a faster performance expectation than the initial load? → A: Yes, subsequent refreshes without changing the "as-of date" filter should be significantly faster (e.g., under 3 seconds).
 - Q: Besides masking account numbers, are there any other data privacy requirements for the information displayed on the dashboard? → A: Display actual balance amounts and institution names as retrieved.
+- Q: What should the lifecycle for user authentication tokens (JWTs) be? → A: Short-lived access tokens (e.g., 15 minutes) with a long-lived refresh token mechanism.
+- Q: What are the primary mechanisms we should implement to prevent CSRF and XSS vulnerabilities in the application? → A: A combination of CSRF tokens, input/output sanitization, and secure cookie/token handling (including HttpOnly cookies and a Content Security Policy).
+- Q: What is the requirement for responsive design on smaller screens (tablet and mobile)? → A: Desktop Only. Mobile and tablet support are not required for the MVP and can be deferred.
 
 ### Session 2025-11-28
 - Q: How should the report display an institution if its data cannot be fetched (e.g., API is down or credentials failed)? → A: Display the institution name in the report but show an error message (e.g., "Failed to retrieve data") instead of account details and totals.
