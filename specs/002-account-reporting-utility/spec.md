@@ -3,48 +3,53 @@
 **Feature Branch**: `002-account-reporting-utility`  
 **Created**: November 28, 2025  
 **Status**: Draft  
-**Input**: User description: "I'm building a SLEEk-looking, modern web-based reporting utility for me to collect account information for all my accounts with various financial institutions and present them to me in a consolidate view. There's a main landing page with a left panel that allows me to specify the filter condition. The filter should have an as-of date field. It should also have a list of financial companies that I can choose to report from. There is a 'Report' button next to the as-of date. Once clicked, I should get the report in the right Panel with a consolidated view. The view should include account number, balance in dollar amount, date of the balance closest to the as-of date for each account. Accounts should be grouped by institution as I sometimes have multiple accounts with the same institute. There should be a sub total for institution and a grand total. I have the user ID and password for each of the institutions. But I need you to figure out how to log into those companies and grab the account info , via API calls. Institutions I have accounts include - Fidelity, Vanguard, Janus, TRow Price, UBS Security and Goldman Sachs 401K. It's CRITICAL for me to minimize the cost of calling such APIs. So please find free services whenever possible."
+**Input**: User description: "Amendment to specs - In the landing page, there should be a left panel with manuals such as Dashboard and Connections. - when the 'Dashboard' is clicked in the left panel, in the right panel i expect to see a filter section. - for the MVP - I should be able to filter by the as-of date field. Note this is optional. If no date is provided, then the as-of date is the latest. - There should also be a refresh button or icon, once clicked it should retrieve the account info from the list of connected institutions and display them with account number, balance amount, actual as-of date. Accounts should be grouped at institution level with subtotal and a grand total as well. - post MVP, I will want to include a list of checkboxes for institutes in the filter section in addition to the as-of date - when the 'Connection' is clicked in the left panel, I would like to see a list of institutions(as listed above) in the right panel, each with a connect icon and a status icon. for unconnected institues, I can click on the 'Connect' icon and be prompted to provide the credential to connect"
 
 ## User Scenarios & Testing
 
-### User Story 1 - View Consolidated Account Report (Priority: P1)
+### User Story 1 - View Consolidated Account Dashboard (Priority: P1)
 
-A user wants to view a consolidated report of their financial accounts from various institutions. They specify an "as-of date" and select the financial institutions they wish to include. After generating the report, they see a clear, grouped view of their accounts, including account numbers, balances, and the closest balance date, along with sub-totals per institution and a grand total.
+A user wants to view a consolidated report of their financial accounts. They navigate to the "Dashboard", which initially displays an empty state prompting them to connect institutions. Once institutions are connected, the dashboard displays a report of their accounts. They can optionally filter by an "as-of date" and refresh the data to get the latest information (the refresh button is disabled if there are no connected institutions). They see a clear, grouped view of their accounts, including account numbers, balances, and the actual as-of date, along with sub-totals per institution and a grand total.
 
-**Why this priority**: This is the core value proposition of the utility, allowing users to quickly see their financial overview. Without this, the utility serves no purpose.
+**Why this priority**: This is the core value proposition of the utility, allowing users to quickly see their financial overview.
 
-**Independent Test**: Can be fully tested by configuring at least one financial institution, providing credentials, selecting it, specifying a date, and observing the generated report's accuracy and format.
+**Independent Test**: Can be fully tested by configuring at least one financial institution, navigating to the Dashboard, and observing the generated report's accuracy and format.
 
 **Acceptance Scenarios**:
 
-1.  **Given** the user is on the main landing page, **When** they select an "as-of date", choose one or more financial institutions, and click "Report", **Then** a consolidated report is displayed in the right panel.
-2.  **Given** a consolidated report is displayed, **When** the user reviews it, **Then** accounts are grouped by institution, each showing account number, balance, and the date of the balance closest to the "as-of date".
-3.  **Given** a consolidated report is displayed, **When** the user reviews it, **Then** a sub-total is shown for each institution group and a grand total for all accounts.
+1.  **Given** the user is on the landing page, **When** they click "Dashboard" in the left navigation panel for the first time with no connections, **Then** an empty state is displayed in the right panel prompting the user to connect institutions, and the 'Refresh' button is disabled.
+2.  **Given** the user is on the landing page, **When** they click "Dashboard" in the left navigation panel with connected institutions, **Then** the Dashboard view is displayed in the right panel with account data.
+3.  **Given** the user is on the Dashboard view, **When** they review the report, **Then** accounts are grouped by institution, each showing account number, balance, and the actual as-of date.
+4.  **Given** the user is on the Dashboard view, **When** they review the report, **Then** a sub-total is shown for each institution group and a grand total for all accounts.
+5.  **Given** the user is on the Dashboard view, **When** they enter a date in the "as-of date" filter and click "Refresh", **Then** the report updates to show data closest to that date.
+6.  **Given** the user is on the Dashboard view, **When** they click "Refresh" without providing an "as-of date", **Then** the report updates to show the latest available data.
 
 ### User Story 2 - Manage Financial Institution Connections (Priority: P2)
 
-A user needs to connect their financial institution accounts to the utility so that data can be retrieved. They provide their user ID and password (or other required credentials) for each institution.
+A user needs to connect their financial institution accounts to the utility. They navigate to the "Connections" page, where they see a list of available institutions, each with its connection status. They can initiate a new connection by clicking a "Connect" icon, which prompts them for the necessary credentials.
 
-**Why this priority**: This directly enables the P1 user story by providing the necessary data sources. It is fundamental but can be developed after the reporting display mechanism is in place.
+**Why this priority**: This directly enables the P1 user story by providing the necessary data sources.
 
-**Independent Test**: Can be fully tested by providing credentials for a single institution and verifying that the system acknowledges the successful connection without necessarily fetching data yet.
+**Independent Test**: Can be fully tested by navigating to the Connections page, clicking "Connect" for an institution, and verifying the system initiates an authentication flow and appropriately handles success or failure.
 
 **Acceptance Scenarios**:
 
-1.  **Given** the user wants to add a new financial institution, **When** they provide valid credentials for that institution, **Then** the system securely stores these credentials and marks the institution as connected for data retrieval.
-2.  **Given** the user provides invalid credentials for an institution, **When** they attempt to connect, **Then** the system informs the user of the failed connection attempt without storing the invalid credentials.
+1.  **Given** the user is on the landing page, **When** they click "Connections" in the left navigation panel, **Then** a list of financial institutions is displayed in the right panel.
+2.  **Given** the user is viewing the list of institutions, **When** they look at an institution, **Then** a status icon and text indicates whether it is connected, disconnected, or has a connection error.
+3.  **Given** an institution is not connected, **When** the user clicks the "Connect" icon next to it, **Then** they are prompted to provide credentials to establish a connection.
+4.  **Given** a connection attempt fails (e.g., due to incorrect credentials), **When** the system processes the attempt, **Then** a specific error message is displayed to the user, and the institution's status in the Connections list reflects the failure.
 
 ### User Story 3 - Prioritize Cost-Effective Data Retrieval (Priority: P3)
 
 The user wants the system to prioritize minimizing the cost of API calls for data retrieval, opting for free services whenever possible.
 
-**Why this priority**: While not directly a user-facing feature in terms of interaction, it's a critical non-functional requirement that impacts the sustainability and desirability of the utility. It can be optimized after core functionality is established.
+**Why this priority**: This is a critical non-functional requirement that impacts the sustainability of the utility.
 
-**Independent Test**: Can be verified by integrating with multiple institutions and observing that the system attempts to use free or low-cost APIs before resorting to more expensive options, if applicable. This would require specific logging or configuration review.
+**Independent Test**: Can be verified by reviewing the system's integration configuration to ensure it prioritizes free or low-cost data sources.
 
 **Acceptance Scenarios**:
 
-1.  **Given** the system needs to retrieve account data, **When** multiple API options exist for an institution (e.g., free direct API, paid direct API, third-party aggregator), **Then** the system attempts to use the most cost-effective option first.
+1.  **Given** the system needs to retrieve account data, **When** multiple API options exist for an institution, **Then** the system attempts to use the most cost-effective option first.
 
 ### Edge Cases
 
@@ -54,47 +59,62 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
     **Clarification**: The system will display the institution name in the report but show an error message (e.g., "Failed to retrieve data") instead of account details and totals.
 -   What if the "as-of date" is in the future or significantly older than available historical data?
     **Clarification**: For accounts with no data on or before the as-of date, "N/A" or "No data available" will be displayed for balance and balance date.
--   How does the system handle financial institutions that do not offer public APIs, or only offer paid APIs?
 
 ## Requirements
 
 ### Functional Requirements
 
--   **FR-001**: System MUST display a main landing page with a filter panel on the left and a report display area on the right.
--   **FR-002**: Filter panel MUST include an "as-of date" input field.
--   **FR-003**: Filter panel MUST include a selectable list of financial institutions.
--   **FR-004**: User MUST be able to select one or more financial institutions from the list.
--   **FR-005**: Filter panel MUST include a "Report" button to trigger report generation.
--   **FR-006**: System MUST present a consolidated account report in the display area upon user request.
--   **FR-007**: Consolidated report MUST group accounts by financial institution.
--   **FR-008**: Consolidated report MUST include masked account number (e.g., "••••1234"), balance in USD (or "N/A" if no data), and the date of the **last known balance on or before** the "as-of date" for each account (or "N/A" if no data).
--   **FR-009**: Consolidated report MUST display a sub-total for each financial institution group.
--   **FR-010**: Consolidated report MUST display a grand total for all accounts.
--   **FR-011**: System MUST securely handle user credentials for financial institutions by leveraging the third-party aggregator's (SnapTrade) secure authentication flow, where the user authenticates directly with the aggregator via a redirect, and the aggregator manages the connection securely.
--   **FR-012**: System MUST retrieve account information by utilizing a third-party aggregation service (e.g., Plaid, SnapTrade) which handles connections and authentication with financial institutions.
--   **FR-013**: System SHOULD prioritize free API services for data retrieval whenever possible.
--   **FR-014**: System MUST log all incoming requests and outgoing responses for auditing purposes.
+-   **FR-001**: System MUST display a main landing page with a navigation panel on the left containing "Dashboard" and "Connections" links.
+-   **FR-002**: When the "Dashboard" link is clicked, the right panel MUST display the account dashboard view.
+-   **FR-003**: The dashboard view MUST contain a filter section.
+-   **FR-004**: The filter section MUST include an optional "as-of date" input field. If no date is provided, the system defaults to the latest available data.
+-   **FR-005**: The filter section MUST include a "Refresh" button or icon.
+-   **FR-006**: Clicking the "Refresh" button MUST trigger a retrieval of account information and update the report display.
+-   **FR-007**: The dashboard report MUST group accounts by financial institution.
+-   **FR-008**: The report MUST include masked account number (e.g., "••••1234"), balance amount, and the 'actual as-of date' for each account, where the 'actual as-of date' is the closest date of the account information available from the institution before or on the 'as-of date' provided in the filter.
+-   **FR-009**: The report MUST display a sub-total for each financial institution group and a grand total for all accounts.
+-   **FR-010**: When the "Connections" link is clicked, the right panel MUST display a list of financial institutions.
+-   **FR-011**: Each institution in the list MUST have a visual status icon and text indicating its connection status (e.g., connected, disconnected, error with a specific message if available).
+-   **FR-012**: Each unconnected institution in the list MUST have a "Connect" icon.
+-   **FR-013**: Clicking the "Connect" icon MUST initiate the secure authentication flow for that institution.
+-   **FR-014**: System MUST securely handle user credentials by leveraging a third-party aggregator's secure authentication flow.
+-   **FR-015**: System SHOULD prioritize free API services for data retrieval whenever possible.
+-   **FR-016**: The dashboard MUST initially display an empty state prompting the user to connect institutions if no connections exist.
+-   **FR-017**: The 'Refresh' button on the dashboard MUST be disabled if no institutions are connected.
+-   **FR-018**: When a connection attempt fails, the system MUST display a specific error message to the user, and the institution's status in the Connections list MUST be updated to reflect the failure.
+-   **FR-019**: The dashboard report MUST display actual balance amounts and institution names as retrieved from the connected financial institutions.
+
+### Out of Scope / Post-MVP
+
+-   A list of checkboxes for institutions in the dashboard filter section will be implemented post-MVP. For the MVP, the dashboard will report on all connected institutions.
 
 ### Assumptions
 
--   **ASM-001**: For the initial version, the system assumes all connected financial accounts are denominated in United States Dollars (USD). Accounts in other currencies will not be supported or will be ignored.
+-   **ASM-001**: For the initial version, the system assumes all connected financial accounts are denominated in United States Dollars (USD).
 
 ### Key Entities
 
--   **Account**: Represents a financial account. Key attributes include: masked account number (e.g., "••••1234"), current balance, date of balance, and associated institution.
--   **Institution**: Represents a financial institution (e.g., Fidelity, Vanguard). Key attributes include: name, and associated user credentials for API access.
--   **Report**: A consolidated view of account information, generated based on user-defined filters.
+-   **Account**: Represents a financial account. Key attributes include: masked account number, balance, as-of date, and associated institution.
+-   **Institution**: Represents a financial institution. Key attributes include: name and connection status.
+-   **Dashboard**: A consolidated view of account information.
 
 ## Success Criteria
 
 ### Measurable Outcomes
 
--   **SC-001**: Users can successfully generate and view a consolidated report for selected institutions and a specified as-of date within 5 seconds for up to 5 institutions.
--   **SC-002**: The consolidated report accurately displays account numbers, balances, and balance dates, with correct sub-totals and a grand total for 100% of reported accounts.
--   **SC-003**: The system successfully connects and retrieves data from at least 3 specified financial institutions (e.g., Fidelity, Vanguard, TRow Price) using their APIs.
--   **SC-004**: The system minimizes the use of paid APIs for data retrieval, favoring solutions that offer the lowest cost, including free tiers of direct APIs, Open Banking APIs, or cost-effective third-party aggregation services (like Plaid or SnapTrade) for at least 80% of integrated institutions.
+-   **SC-001**: From the landing page, a user can navigate to the Dashboard and view a consolidated report for all connected institutions within 10 seconds (initial load). Subsequent refreshes without changing the "as-of date" filter should complete within 3 seconds.
+-   **SC-002**: The dashboard report accurately displays account numbers, balances, and as-of dates, with correct sub-totals and a grand total for 100% of reported accounts.
+-   **SC-003**: From the Connections page, a user can successfully initiate a connection process for at least 3 specified financial institutions.
+-   **SC-004**: The system minimizes the use of paid APIs, favoring cost-effective solutions for at least 80% of integrated institutions.
 
 ## Clarifications
+
+### Session 2025-11-30
+- Q: What should the dashboard display when a user views it for the very first time? → A: An empty state that instructs the user to go to the "Connections" page to add an institution. The 'Refresh' button should be disabled if there is no active connection.
+- Q: On the "Connections" page, if a user tries to connect to a new institution and the authentication fails, how should the failure be communicated? → A: Display a specific error message reflecting the failure. The status for that institution in the Connection tab should also reflect the failure with the message.
+- Q: What exactly does "actual as-of date" mean for an account balance in the report? → A: The closest date of the account information available from the institution before or on the as-of date provided in the filter.
+- Q: Should subsequent refreshes of the dashboard report have a faster performance expectation than the initial load? → A: Yes, subsequent refreshes without changing the "as-of date" filter should be significantly faster (e.g., under 3 seconds).
+- Q: Besides masking account numbers, are there any other data privacy requirements for the information displayed on the dashboard? → A: Display actual balance amounts and institution names as retrieved.
 
 ### Session 2025-11-28
 - Q: How should the report display an institution if its data cannot be fetched (e.g., API is down or credentials failed)? → A: Display the institution name in the report but show an error message (e.g., "Failed to retrieve data") instead of account details and totals.
@@ -102,5 +122,3 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 - Q: What should be displayed for an account if there is no balance available on or before the selected "as-of date"? → A: Display "N/A" or "No data available" for the balance and balance date for that specific account.
 - Q: How should account numbers be displayed in the report? → A: Mask the account number (e.g., "••••1234").
 - Q: What level of logging is required for the application? → A: Log all requests and responses for auditing purposes.
-
-## Requirements
