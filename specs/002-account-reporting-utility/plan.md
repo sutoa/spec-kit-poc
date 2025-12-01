@@ -10,7 +10,7 @@ This section defines the architectural approach and technology stack for the pro
 
 -   **Frontend**:
     -   **Framework**: React with TypeScript
-    -   **Styling**: Material-UI (MUI) for a modern and sleek component library.
+    -   **Styling**: Tailwind CSS. This choice ensures a "pixel-perfect" implementation that precisely matches the provided UI mockups in `specs/002-account-reporting-utility/screens/`.
     -   **State Management**: React Context or Zustand for managing application state.
 
 -   **Backend**:
@@ -26,9 +26,9 @@ This section defines the architectural approach and technology stack for the pro
 
 ## 2. Constitution Check
 
--   **Simplicity and Maintainability**: The chosen stack (React, FastAPI) promotes clean, modern, and maintainable code. The architecture is straightforward.
+-   **Simplicity and Maintainability**: The chosen stack (React, FastAPI, Tailwind CSS) promotes clean, modern, and maintainable code. The architecture is straightforward.
 -   **Test-Driven Development (TDD)**: Both frontend (with Jest/React Testing Library) and backend (with Pytest) have mature testing frameworks available. Tests will be required for all new functionality.
--   **User Experience (UX) Focus**: The choice of React with MUI allows for a highly interactive and polished user experience.
+-   **User Experience (UX) Focus**: The choice of React with Tailwind CSS allows for building a custom, highly interactive, and polished user experience that is a pixel-perfect match for the design mockups.
 -   **Performance Optimization**: FastAPI is known for its high performance. Frontend performance will be monitored, and the spec includes performance-related success criteria.
 
 **Gate Check**: No constitutional violations identified at this stage.
@@ -68,8 +68,17 @@ This phase involves writing the code, but the detailed task breakdown will be ge
     -   Integrate with the chosen financial data aggregator.
     -   Implement database models and business logic.
 -   **Frontend**:
-    -   Set up React application.
-    -   Build UI components for the Dashboard and Connections pages.
+    -   Set up React application and configure Tailwind CSS.
+    -   Build a component-based UI that is a pixel-perfect match to the mockups. The component architecture will include:
+        -   **`Layout`**: Main application wrapper containing shared elements like the side navigation and header.
+        -   **`SideNav`**: The collapsible left navigation panel.
+        -   **`Header`**: The top bar displaying page titles, action buttons, and user information.
+        -   **`DashboardPage`**: The page component for the dashboard.
+        -   **`ConnectionsPage`**: The page component for connection management.
+        -   **`ConnectionCard`**: A reusable card to display an institution on the `ConnectionsPage`.
+        -   **`DashboardFilterPanel`**: The filter panel on the `DashboardPage`.
+        -   **`ReportTable`**: The component for displaying the financial report on the `DashboardPage`.
+        -   **`StatCard`**: A reusable card for high-level metrics (e.g., "Grand Total").
     -   Implement state management and API client to communicate with the backend.
 -   **Testing**:
     -   Write unit and integration tests for both frontend and backend.

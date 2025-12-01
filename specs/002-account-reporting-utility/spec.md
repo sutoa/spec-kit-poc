@@ -62,25 +62,62 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 
 ## Requirements
 
+### UI/UX Requirements
+
+The user interface and user experience MUST be implemented to be a "pixel-perfect" match of the provided mockups.
+
+-   **Mockups Location**: `specs/002-account-reporting-utility/screens/`
+-   **Styling**: The implementation MUST use Tailwind CSS and the color palette, fonts, and dark mode conventions defined in the mockup `code.html` files.
+
+#### UI-001: Main Application Layout
+-   **Reference**: `screens/dashboard_tab/screen.png`, `screens/connection_tab/screen.png`
+-   The application MUST feature a primary layout with a collapsible left-side navigation panel and a main content area.
+-   The left navigation panel MUST contain links with icons for "Dashboard", "Connections", "Settings", and "Logout".
+-   The active navigation link MUST be visually distinct, as shown in the mockups (e.g., background color and filled icon).
+
+#### UI-002: Header
+-   **Reference**: `screens/dashboard_tab/screen.png`, `screens/connection_tab/screen.png`
+-   A header bar MUST be present at the top of the main content area.
+-   The header MUST display the current page's title (e.g., "Connection", "Consolidated Account Report").
+-   The header on the Connections page MUST include icons for "Notifications" and "Help", and a circular user avatar.
+-   The header on the Dashboard page MUST include "Export Report" and "Refresh Data" buttons, and a circular user avatar.
+
+#### UI-003: Connections Page
+-   **Reference**: `screens/connection_tab/screen.png`, `screens/connection_tab/code.html`
+-   The page MUST feature a main title ("Manage Financial Institutions") and a subtitle.
+-   An "Add New Connection" button MUST be present.
+-   A search bar MUST be available to filter institutions.
+-   Institutions MUST be displayed in a grid of cards.
+-   Each card MUST display the institution's logo, name, and a "more_vert" (three-dot) menu icon.
+-   The card MUST display the connection status, including a colored dot (e.g., green for "Connected") and status text.
+
+#### UI-004: Dashboard Page
+-   **Reference**: `screens/dashboard_tab/screen.png`, `screens/dashboard_tab/code.html`
+-   The main content area MUST be divided into a left-side "Filters" panel and a right-side report section.
+-   The "Filters" panel MUST contain an "As of Date" picker and a searchable list of institutions with checkboxes.
+-   The report section MUST display high-level metrics in cards ("Grand Total", "Total Institutions").
+-   The report section MUST display institution-specific data in distinct cards/tables. Each card MUST have a header with the institution's name and a sub-total.
+-   Within each institution card, individual accounts MUST be listed in rows showing account details and balances, matching the multi-column layout in the mockup.
+
 ### Functional Requirements
 
--   **FR-001**: System MUST display a main landing page with a navigation panel on the left containing "Dashboard" and "Connections" links.
--   **FR-002**: When the "Dashboard" link is clicked, the right panel MUST display the account dashboard view.
--   **FR-003**: The dashboard view MUST contain a filter section.
+-   **FR-001**: System MUST display a main landing page with a navigation panel on the left as per **UI-001**.
+-   **FR-002**: When the "Dashboard" link is clicked, the right panel MUST display the account dashboard view as per **UI-004**.
+-   **FR-003**: The dashboard view MUST contain a filter section as per **UI-004**.
 -   **FR-004**: The filter section MUST include an optional "as-of date" input field. If no date is provided, the system defaults to the latest available data.
--   **FR-005**: The filter section MUST include a "Refresh" button or icon.
--   **FR-006**: Clicking the "Refresh" button MUST trigger a retrieval of account information and update the report display.
--   **FR-007**: The dashboard report MUST group accounts by financial institution.
+-   **FR-005**: The dashboard header MUST include a "Refresh Data" button as per **UI-002**.
+-   **FR-006**: Clicking the "Refresh Data" button MUST trigger a retrieval of account information and update the report display.
+-   **FR-007**: The dashboard report MUST group accounts by financial institution in separate cards/tables as per **UI-004**.
 -   **FR-008**: The report MUST include masked account number (e.g., "••••1234"), balance amount, and the 'actual as-of date' for each account, where the 'actual as-of date' is the closest date of the account information available from the institution before or on the 'as-of date' provided in the filter.
--   **FR-009**: The report MUST display a sub-total for each financial institution group and a grand total for all accounts.
--   **FR-010**: When the "Connections" link is clicked, the right panel MUST display a list of financial institutions.
--   **FR-011**: Each institution in the list MUST have a visual status icon and text indicating its connection status (e.g., connected, disconnected, error with a specific message if available).
--   **FR-012**: Each unconnected institution in the list MUST have a "Connect" icon.
--   **FR-013**: Clicking the "Connect" icon MUST initiate the secure authentication flow for that institution.
+-   **FR-009**: The report MUST display a sub-total for each financial institution group and a grand total for all accounts, as shown in **UI-004**.
+-   **FR-010**: When the "Connections" link is clicked, the right panel MUST display a list of financial institutions as per **UI-003**.
+-   **FR-011**: Each institution in the list MUST have a visual status icon (colored dot) and text indicating its connection status (e.g., connected, disconnected, error with a specific message if available), as shown in the `ConnectionCard` design.
+-   **FR-012**: Each institution card MUST have a "more_vert" (three-dot) menu.
+-   **FR-013**: For an unconnected institution, when the user clicks the "more_vert" menu, it MUST present a "Connect" option. Clicking "Connect" MUST initiate the secure authentication flow for that institution.
 -   **FR-014**: System MUST securely handle user credentials by leveraging a third-party aggregator's secure authentication flow.
 -   **FR-015**: System SHOULD prioritize free API services for data retrieval whenever possible.
 -   **FR-016**: The dashboard MUST initially display an empty state prompting the user to connect institutions if no connections exist.
--   **FR-017**: The 'Refresh' button on the dashboard MUST be disabled if no institutions are connected.
+-   **FR-017**: The 'Refresh Data' button on the dashboard MUST be disabled if no institutions are connected.
 -   **FR-018**: When a connection attempt fails, the system MUST display a specific error message to the user, and the institution's status in the Connections list MUST be updated to reflect the failure.
 -   **FR-019**: The dashboard report MUST display actual balance amounts and institution names as retrieved from the connected financial institutions.
 -   **FR-020**: The system MUST implement a JWT-based authentication system using short-lived access tokens (e.g., 15 minutes expiration) and long-lived refresh tokens. The backend MUST generate and validate these tokens, and the frontend MUST manage their refresh securely.
@@ -94,6 +131,8 @@ The user wants the system to prioritize minimizing the cost of API calls for dat
 -   **FR-028**: The 'actual as-of date' displayed on the dashboard for account balances MUST use the `YYYY-MM-DD` format (e.g., `2025-11-30`).
 -   **FR-029**: While dashboard data is being loaded, the UI MUST display a skeleton loader that mimics the final report table layout.
 -   **FR-030**: All application data, especially sensitive user and financial information, MUST be encrypted in transit using TLS 1.2+ and encrypted at rest within the database.
+-   **FR-031**: The Connections page MUST have an "Add New Connection" button that, when clicked, initiates a connection flow.
+-   **FR-032**: The Connections page MUST feature a search bar that filters the list of displayed institutions in real-time as the user types.
 
 ### Out of Scope / Post-MVP
 
