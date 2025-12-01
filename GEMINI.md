@@ -16,7 +16,8 @@ tests/
 
 ## Commands
 
-cd src [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] pytest [ONLY COMMANDS FOR ACTIVE TECHNOLOGIES][ONLY COMMANDS FOR ACTIVE TECHNOLOGIES] ruff check .
+PYTHONPATH=. pytest backend/tests
+ruff check backend/
 
 ## Code Style
 

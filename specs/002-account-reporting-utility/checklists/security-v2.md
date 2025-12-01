@@ -6,15 +6,15 @@
 
 ## Authentication & Authorization
 
-- [ ] CHK001 - Are the requirements for the JWT-based authentication system, including token expiration and the refresh mechanism, clear and sufficient for implementation? [Clarity, Spec §FR-020]
+- [X] CHK001 - Are the requirements for the JWT-based authentication system, including token expiration and the refresh mechanism, clear and sufficient for implementation? [Clarity, Spec §FR-020]
 - [ ] CHK002 - Does the `plan.md` or `tasks.md` specify the secure storage mechanism for JWTs on the frontend (e.g., HttpOnly cookie, in-memory)? [Completeness]
-- [ ] CHK003 - Are authorization requirements for all protected API endpoints explicitly stated and checked? [Completeness, `contracts/openapi.yaml`]
+- [X] CHK003 - Are authorization requirements for all protected API endpoints explicitly stated and checked? [Completeness, `contracts/openapi.yaml`]
 - [ ] CHK004 - Are the requirements for implementing anti-CSRF token validation sufficient for a developer to implement correctly? [Clarity, Spec §FR-021]
 
 ## Data Protection
 
 - [ ] CHK005 - Are requirements for encrypting sensitive data at rest (e.g., in the database) and in transit (TLS) clearly defined? [Gap]
-- [ ] CHK006 - Are requirements for securely storing SnapTrade API credentials (e.g., environment variables, a secrets manager) explicitly stated? [Completeness, `plan.md`]
+- [X] CHK006 - Are requirements for securely storing SnapTrade API credentials (e.g., environment variables, a secrets manager) explicitly stated? [Completeness, `plan.md`]
 - [ ] CHK007 - Is the requirement for input sanitization and output escaping sufficiently clear for all relevant fields and components? [Clarity, Spec §FR-022]
 - [ ] CHK008 - Are requirements for securing the SQLite database file specified, particularly if it were to be used in a non-development environment? [Gap]
 
@@ -26,7 +26,7 @@
 
 ## Logging & Auditing
 
-- [ ] CHK012 - Are specific logging requirements for security-sensitive events (e.g., successful/failed login, connection changes, token refresh) explicitly defined? [Completeness, Spec §Clarifications]
+- [X] CHK012 - Are specific logging requirements for security-sensitive events (e.g., successful/failed login, connection changes, token refresh) explicitly defined? [Completeness, Spec §Clarifications]
 - [ ] CHK013 - Are requirements for protecting log data from unauthorized access or tampering specified? [Gap]
 
 ## Secure Configuration
