@@ -1,11 +1,10 @@
-import React from 'react';
+
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
 const SideNav = () => {
   const activeClassName = "bg-primary/10 text-text-primary-light dark:text-text-primary-dark";
   const inactiveClassName = "text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5";
-  const { logout } = useAuth();
+
 
   return (
     <div className="flex flex-col bg-panel-light dark:bg-panel-dark border-r border-border-light dark:border-border-dark transition-all duration-300 w-64 relative">
@@ -37,11 +36,7 @@ const SideNav = () => {
             Connections
           </NavLink>
         </div>
-        <div className="mt-auto flex flex-col gap-2">
-           <a href="#" onClick={logout} className={`${inactiveClassName} flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap`}>
-              Logout
-           </a>
-        </div>
+
       </div>
     </div>
   );

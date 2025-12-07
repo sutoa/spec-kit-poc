@@ -179,7 +179,7 @@ async def connections_callback_endpoint(callback_data: schemas.SnapTradeCallback
 from .cache import cache
 
 @app.get("/dashboard", response_model=schemas.Dashboard)
-async def get_dashboard(as_of_date: Optional[str] = None, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_dashboard(as_of_date: Optional[str] = None, db: Session = Depends(get_db)):
     
     as_of_date_dt: Optional[datetime] = None
     if as_of_date:
@@ -192,10 +192,13 @@ async def get_dashboard(as_of_date: Optional[str] = None, current_user: models.U
                 as_of_date_dt = as_of_date_dt.replace(tzinfo=timezone.utc)
             else:
                 as_of_date_dt = as_of_date_dt.astimezone(timezone.utc)
-
         except ValueError:
             raise HTTPException(status_code=422, detail="Invalid as_of_date format. Expected ISO 8601 string.")
-    
+
+    # Retrieve the default dashboard_user directly
+    current_user = crud.get_user_by_username(db, username="dashboard_user")
+    if not current_user:
+        raise HTTPException(status_code=404, detail="Default dashboard user not found. Please run seed_db.py")
     connections = crud.get_connections(db, user_id=current_user.id)
     
     institutions = []

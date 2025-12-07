@@ -1,14 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { SnapTradeConnect } from 'snaptrade-react';
+import { useCallback, useEffect, useState } from 'react';
+import { SnapTradeReact } from 'snaptrade-react';
 import { connectionsApi } from '../services/api';
 import ConnectionCard from '../components/ConnectionCard';
 import { useNotification } from '../context/NotificationContext';
+import { Connection } from '../types/connection';
 
-interface Connection {
-  id: number;
-  institution_name: string;
-  status: string;
-}
+
 
 const ConnectionsPage = () => {
   const [connections, setConnections] = useState<Connection[]>([]);
@@ -57,9 +54,7 @@ const ConnectionsPage = () => {
     [connectionData, fetchConnections, showNotification]
   );
 
-  const handleEvent = (event: any) => {
-    console.log('SnapTrade Event:', event);
-  };
+
 
   const handleExit = () => {
     console.log('SnapTrade exited');
@@ -70,12 +65,12 @@ const ConnectionsPage = () => {
     return (
       <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl h-3/4">
-          <SnapTradeConnect
-            loginUrl={connectionData.loginUrl}
-            onSuccess={handleSuccess}
-            onEvent={handleEvent}
-            onExit={handleExit}
-          />
+                    <SnapTradeReact
+                      loginLink={connectionData.loginUrl}
+                      isOpen={connectionData !== null}
+                      onSuccess={handleSuccess}
+                      close={handleExit}
+                    />
         </div>
       </div>
     );

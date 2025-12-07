@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { api } from '../services/api';
 
 interface AuthContextType {
@@ -16,7 +16,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const response = await api.post('/token', new URLSearchParams({
       username,
       password,
-    }));
+    }), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
     const { access_token } = response.data;
     localStorage.setItem('token', access_token);
     api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;

@@ -1,10 +1,8 @@
-import React from 'react';
 
-interface Connection {
-  id: number;
-  institution_name: string;
-  status: string;
-}
+
+
+
+import { Connection } from '../types/connection';
 
 interface ConnectionCardProps {
   connection: Connection;
