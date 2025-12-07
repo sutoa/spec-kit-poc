@@ -10,7 +10,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from .config import settings
 import httpx
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from fastapi.middleware.cors import CORSMiddleware # Import CORSMiddleware
 
 # Import logging_config to apply logging settings
 from . import logging_config
@@ -18,6 +19,14 @@ from . import logging_config
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Allow your frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -170,7 +179,22 @@ async def connections_callback_endpoint(callback_data: schemas.SnapTradeCallback
 from .cache import cache
 
 @app.get("/dashboard", response_model=schemas.Dashboard)
-async def get_dashboard(as_of_date: Optional[datetime] = None, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_dashboard(as_of_date: Optional[str] = None, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    
+    as_of_date_dt: Optional[datetime] = None
+    if as_of_date:
+        try:
+            if as_of_date.endswith('Z'):
+                as_of_date = as_of_date[:-1] + '+00:00'
+            as_of_date_dt = datetime.fromisoformat(as_of_date)
+            # Ensure it's UTC-aware for consistent comparison
+            if as_of_date_dt.tzinfo is None:
+                as_of_date_dt = as_of_date_dt.replace(tzinfo=timezone.utc)
+            else:
+                as_of_date_dt = as_of_date_dt.astimezone(timezone.utc)
+
+        except ValueError:
+            raise HTTPException(status_code=422, detail="Invalid as_of_date format. Expected ISO 8601 string.")
     
     connections = crud.get_connections(db, user_id=current_user.id)
     
@@ -210,17 +234,17 @@ async def get_dashboard(as_of_date: Optional[datetime] = None, current_user: mod
                 for acc in accounts_data:
                     # Simulate as_of_date by using last_updated.
                     # SnapTrade's sandbox may not provide historical snapshots, so we filter what we get.
-                    last_updated_date = acc.get("meta", {}).get("last_updated_at", datetime.utcnow().isoformat())
+                    last_updated_date = acc.get("meta", {}).get("last_updated_at", datetime.now(timezone.utc).isoformat())
                     last_updated = datetime.fromisoformat(last_updated_date.replace("Z", "+00:00"))
                     
-                    if as_of_date and last_updated > as_of_date:
+                    if as_of_date_dt and last_updated > as_of_date_dt:
                         continue
 
                     if acc.get("balance") and acc["balance"].get("total") is not None:
                         account_balance = acc["balance"]["total"]
                         accounts.append(schemas.Account(
                             id=acc.get("id", "N/A"),
-                            snaptrade_account_id=acc.get("id", "N/A"),
+                            snaptrade_account_id=acc.get("snaptrade_account_id", "N/A"),
                             masked_account_number=acc.get("number", "N/A"),
                             balance=account_balance,
                             currency=acc.get("currency", {}).get("code", "USD"),
