@@ -1,101 +1,93 @@
-import React, { useEffect, useState } from 'react';
-import { dashboardApi } from '../services/api';
-import { DashboardFilterPanel } from '../components/DashboardFilterPanel';
-import { ReportTable } from '../components/ReportTable';
-import { StatCard } from '../components/StatCard';
-import { useNotification } from '../context/NotificationContext'; // Import useNotification
+import React, { useCallback, useEffect, useState } from 'react';
+import { dashboardApi, connectionsApi } from '../services/api';
+import ReportTable from '../components/ReportTable';
+import StatCard from '../components/StatCard';
+import DashboardFilterPanel from '../components/DashboardFilterPanel';
+import SkeletonLoader from '../components/SkeletonLoader';
+import { useNotification } from '../context/NotificationContext';
 
-interface Account {
-  masked_account_number: string;
-  balance: number;
-  currency: string;
-  as_of_date: string; // Assuming ISO date string
-}
-
-interface Institution {
-  name: string;
-  accounts: Account[];
-  sub_total: number;
-}
-
-interface DashboardData {
-  institutions: Institution[];
-  grand_total: number;
-}
-
-const DashboardPage: React.FC = () => {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+const DashboardPage = () => {
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [connections, setConnections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { showNotification } = useNotification(); // Use the notification hook
+  const [asOfDate, setAsOfDate] = useState<string>('');
+  const { showNotification } = useNotification();
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async (date?: string) => {
     setLoading(true);
     try {
-      const data = await dashboardApi.getDashboardData();
+      const data = await dashboardApi.getDashboardData(date);
       setDashboardData(data);
-    } catch (err) {
-      showNotification('Failed to fetch dashboard data.', 'error'); // Use notification
-      console.error(err);
+    } catch (error) {
+      // Notification is handled by the interceptor
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+  
+  const fetchConnections = useCallback(async () => {
+    try {
+      const data = await connectionsApi.getConnections();
+      setConnections(data);
+    } catch (error) {
+      // Notification is handled by the interceptor
+    }
+  }, []);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [showNotification]); // Add showNotification to dependency array
+    fetchConnections();
+    fetchDashboardData(asOfDate);
+  }, [fetchConnections, fetchDashboardData, asOfDate]);
 
-  const hasConnections = dashboardData && dashboardData.institutions.length > 0;
-
-  const handleRefreshData = () => {
-    fetchDashboardData(); // Re-fetch data on refresh
+  const handleRefresh = () => {
+    showNotification('Refreshing data...', 'info');
+    fetchDashboardData(asOfDate);
   };
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAsOfDate(e.target.value);
+  };
+  
+  const handleApplyFilters = () => {
+      fetchDashboardData(asOfDate);
+  }
+
   return (
-    <div className="p-6 h-full flex flex-col">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={handleRefreshData}
-          disabled={!hasConnections || loading} // Disable if no connections or loading
-        >
-          Refresh Data
-        </button>
-      </div>
-      
-      {loading && <p>Loading dashboard data...</p>}
-      {/* Removed local error display, global notification handles it */}
-
-      {!loading && !hasConnections && ( // Removed !error check
-        <div className="flex flex-col items-center justify-center h-full text-gray-500">
-          <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          <p className="text-xl font-medium mb-2">No Data to Display</p>
-          <p className="text-md">Connect your financial institutions to see your consolidated dashboard.</p>
-          {/* Optionally, add a button to navigate to connections page */}
-        </div>
-      )}
-
-      {!loading && hasConnections && dashboardData && ( // Removed !error check
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* First Column: Filters */}
-          <div className="md:col-span-1">
-            <DashboardFilterPanel />
+    <div className="flex flex-1">
+      <aside className="w-80 flex-shrink-0 bg-panel-light dark:bg-panel-dark border-r border-border-light dark:border-border-dark flex flex-col p-6">
+        <DashboardFilterPanel
+          asOfDate={asOfDate}
+          onDateChange={handleDateChange}
+          onRefresh={handleRefresh}
+          onApplyFilters={handleApplyFilters}
+          hasConnections={connections.length > 0}
+        />
+      </aside>
+      <section className="flex-1 bg-background-light dark:bg-background-dark p-8 overflow-y-auto">
+        {loading ? (
+          <SkeletonLoader />
+        ) : !dashboardData || dashboardData.institutions.length === 0 ? (
+          <div className="text-center py-20 bg-panel-light dark:bg-panel-dark rounded-lg shadow">
+            <h2 className="text-2xl font-semibold text-text-primary-light dark:text-text-primary-dark mb-2">No Data to Display</h2>
+            <p className="text-text-secondary-light dark:text-text-secondary-dark">
+              Please connect one or more financial institutions on the 'Connections' page.
+            </p>
           </div>
-
-          {/* Second Column: Report */}
-          <div className="md:col-span-2">
+        ) : (
+          <div className="max-w-4xl mx-auto flex flex-col gap-6">
+            <div className="bg-panel-light dark:bg-panel-dark p-6 rounded-xl border border-border-light dark:border-border-dark flex-1">
+              <StatCard
+                title="Grand Total (USD)"
+                value={dashboardData.grand_total.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                })}
+              />
+            </div>
             <ReportTable institutions={dashboardData.institutions} />
           </div>
-
-          {/* Third Column: Stats */}
-          <div className="md:col-span-1 flex flex-col space-y-6">
-            <StatCard title="Grand Total" value={`$${dashboardData.grand_total.toFixed(2)}`} />
-            <StatCard title="Total Institutions" value={dashboardData.institutions.length.toString()} />
-            {/* Other stat cards can go here */}
-          </div>
-        </div>
-      )}
+        )}
+      </section>
     </div>
   );
 };

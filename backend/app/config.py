@@ -1,16 +1,11 @@
-from pydantic import BaseModel, Field
-from dotenv import dotenv_values # Import dotenv_values
+from pydantic import BaseSettings
 
-# Load environment variables from .env file
-config_values = dotenv_values(".env")
+class Settings(BaseSettings):
+    snaptrade_client_id: str = "test_client_id"
+    snaptrade_client_secret: str = "test_client_secret"
+    secret_key: str = "your-secret-key"  # CHANGE THIS IN PRODUCTION
 
-class Settings(BaseModel):
-    # Use Field to specify default values and read from environment
-    SNAPTRADE_CLIENT_ID: str = Field(default=config_values.get("SNAPTRADE_CLIENT_ID", ""))
-    SNAPTRADE_CLIENT_SECRET: str = Field(default=config_values.get("SNAPTRADE_CLIENT_SECRET", ""))
-    SECRET_KEY: str = Field(default=config_values.get("SECRET_KEY", "a_very_secret_key"))
-    ALGORITHM: str = Field(default=config_values.get("ALGORITHM", "HS256"))
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=int(config_values.get("ACCESS_TOKEN_EXPIRE_MINUTES", 15)))
-    REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=int(config_values.get("REFRESH_TOKEN_EXPIRE_DAYS", 7)))
+    class Config:
+        env_file = ".env"
 
 settings = Settings()

@@ -1,25 +1,13 @@
 # Frontend - React Application
 
-This directory contains the React TypeScript frontend application for the Account Reporting Utility.
+This directory contains the React frontend application for the Account Reporting Utility.
 
 ## Setup
 
-1.  **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
-
-2.  **Install dependencies:**
+1.  **Install dependencies:**
     ```bash
     npm install
     ```
-
-3.  **Configuration:**
-    Create a `.env` file in this directory if you need to override the default API base URL:
-    ```
-    VITE_API_BASE_URL=http://localhost:8000
-    ```
-    (Ensure this matches your backend's running address if not default)
 
 ## Running the Application
 
@@ -29,16 +17,25 @@ To start the development server:
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173` (or another port if 5173 is in use).
+The application will be available at `http://localhost:5173` by default (check the output of the command for the exact URL).
 
 ## Project Structure
 
--   `src/App.tsx`: Main application component, sets up routing and layout.
--   `src/main.tsx`: Entry point for the React application.
--   `src/index.css`: Tailwind CSS imports and base styles.
--   `src/components/`: Reusable UI components (e.g., `Layout`, `SideNav`, `Header`, `ConnectionCard`, `StatCard`, `ReportTable`, `DashboardFilterPanel`).
--   `src/pages/`: Page-level components (e.g., `DashboardPage`, `ConnectionsPage`).
--   `src/services/api.ts`: API client for interacting with the backend.
--   `src/services/authService.ts`: Handles token storage and authentication related logic.
--   `tailwind.config.js`: Tailwind CSS configuration.
--   `postcss.config.js`: PostCSS configuration for Tailwind CSS.
+-   `src/main.tsx`: The entry point of the application.
+-   `src/App.tsx`: The main application component, which sets up routing.
+-   `src/pages/`: Page components for different routes (e.g., `DashboardPage`, `ConnectionsPage`, `LoginPage`).
+-   `src/components/`: Reusable components used across different pages.
+-   `src/services/api.ts`: An Axios instance configured for making API requests to the backend.
+-   `src/context/`: React context providers for managing global state (e.g., `AuthContext`, `NotificationContext`).
+-   `tailwind.config.js`: Configuration for the Tailwind CSS framework.
+-   `vite.config.ts`: Configuration for the Vite build tool.
+
+## Building for Production
+
+To create a production build of the application:
+
+```bash
+npm run build
+```
+
+The output will be in the `dist/` directory.

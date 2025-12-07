@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 class UserBase(BaseModel):
     username: str
@@ -10,6 +10,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+    snaptrade_user_id: str
     created_at: datetime
 
     class Config:
@@ -19,15 +20,17 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class TokenData(BaseModel):
-    username: str | None = None
+class Account(BaseModel):
+    id: int
+    snaptrade_account_id: str
+    masked_account_number: str
+    balance: float
+    currency: str
+    as_of_date: datetime
+    last_updated: datetime
 
-class LoginRedirectURI(BaseModel):
-    redirect_uri: str
-
-class SnapTradeCallback(BaseModel):
-    authorization_id: str
-    state: str
+    class Config:
+        orm_mode = True
 
 class ConnectionBase(BaseModel):
     institution_name: str
@@ -39,24 +42,23 @@ class ConnectionCreate(ConnectionBase):
 class Connection(ConnectionBase):
     id: int
     created_at: datetime
-    snaptrade_connection_id: str
+    accounts: List[Account] = []
 
     class Config:
         orm_mode = True
 
-class Account(BaseModel):
-    masked_account_number: str
-    balance: float
-    currency: str
-    as_of_date: datetime
-    last_updated: datetime
-    status: str = "Active"
+class SnapTradeCallback(BaseModel):
+    authorization_id: str
+    state: str
 
 class Institution(BaseModel):
     name: str
-    accounts: List[Account]
-    sub_total: float
+    accounts: List[Account] = []
 
 class Dashboard(BaseModel):
-    institutions: List[Institution]
+    institutions: List[Institution] = []
     grand_total: float
+
+class SnapTradeLoginResponse(BaseModel):
+    redirect_uri: str
+    state: str

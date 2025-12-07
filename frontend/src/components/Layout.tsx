@@ -1,21 +1,24 @@
 import React from 'react';
-import { SideNav } from './SideNav'; // Assuming SideNav will be created soon
-import { Header } from './Header'; // Assuming Header will be created soon
+import SideNav from './SideNav';
+import Header from './Header';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-background-light dark:bg-background-dark font-display">
       <SideNav />
-      <div className="flex flex-col flex-1">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
           {children}
         </main>
       </div>
     </div>
   );
 };
+
+export default Layout;
+

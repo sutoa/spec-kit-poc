@@ -11,6 +11,8 @@ Represents a user of the application.
 | `id` | INTEGER | Primary Key |
 | `username` | TEXT | The user's unique username. |
 | `hashed_password` | TEXT | The user's hashed password. |
+| `snaptrade_user_id` | TEXT | The user's ID from SnapTrade. |
+| `snaptrade_user_secret` | TEXT | The user's secret from SnapTrade. |
 | `created_at` | TIMESTAMP | The timestamp when the user was created. |
 
 ## 2. Connection

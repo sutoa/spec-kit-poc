@@ -1,10 +1,153 @@
 import pytest
 from fastapi.testclient import TestClient
-from backend.app.main import app
+from unittest.mock import patch, AsyncMock
+from datetime import datetime, timedelta
 
-client = TestClient(app)
+from backend.app.main import app, get_db, cache
+from backend.app.database import Base, engine
+from backend.app.models import User, Connection
+from backend.app.crud import create_user
+from backend.app.schemas import UserCreate
+from backend.app.security import create_access_token
+from sqlalchemy.orm import sessionmaker
 
-def test_dashboard_endpoint_placeholder():
-    # This is a placeholder test.
-    # Actual implementation will involve mocking SnapTrade API calls and testing data aggregation.
-    assert True
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_database():
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def clear_cache():
+    cache.clear()
+
+@pytest.fixture(scope="function")
+def db_session():
+    connection = engine.connect()
+    transaction = connection.begin()
+    db = TestingSessionLocal(bind=connection)
+    try:
+        yield db
+    finally:
+        db.close()
+        transaction.rollback()
+        connection.close()
+
+
+@pytest.fixture(scope="function")
+def client(db_session):
+    def _override_get_db():
+        yield db_session
+    app.dependency_overrides[get_db] = _override_get_db
+    return TestClient(app)
+
+
+@pytest.fixture(scope="function")
+@patch("httpx.Client.post")
+def test_user(mock_post, db_session):
+    mock_snaptrade_response = {"userId": "test_snap_user_id", "userSecret": "test_snap_user_secret"}
+    mock_post.return_value.status_code = 200
+    mock_post.return_value.json.return_value = mock_snaptrade_response
+
+    user_in = UserCreate(username="dashboard_user", password="password")
+    user = create_user(db=db_session, user=user_in)
+    db_session.commit()
+    return user
+
+
+@pytest.fixture(scope="function")
+def auth_headers(test_user):
+    token = create_access_token(data={"sub": test_user.username})
+    return {"Authorization": f"Bearer {token}"}
+
+
+@patch("httpx.AsyncClient.get", new_callable=AsyncMock)
+def test_get_dashboard_success(mock_snaptrade_get, client, db_session, test_user, auth_headers):
+    # Setup: Create connections for the user
+    conn1 = Connection(user_id=test_user.id, institution_name="Bank Alpha", status="active", snaptrade_connection_id="snap1")
+    conn2 = Connection(user_id=test_user.id, institution_name="Brokerage Beta", status="active", snaptrade_connection_id="snap2")
+    db_session.add_all([conn1, conn2])
+    db_session.commit()
+
+    # Mock SnapTrade API responses
+    mock_snaptrade_get.side_effect = [
+        # Response for conn1
+        AsyncMock(status_code=200, json=lambda: [
+            {"id": "acc1", "number": "111", "balance": {"total": 1000, "currency": "USD"}, "meta": {"last_updated_at": "2023-01-01T12:00:00Z"}},
+            {"id": "acc2", "number": "222", "balance": {"total": 2500, "currency": "USD"}, "meta": {"last_updated_at": "2023-01-01T12:00:00Z"}},
+        ]),
+        # Response for conn2
+        AsyncMock(status_code=200, json=lambda: [
+            {"id": "acc3", "number": "333", "balance": {"total": 5000, "currency": "CAD"}, "meta": {"last_updated_at": "2023-01-01T12:00:00Z"}},
+        ]),
+    ]
+    
+    response = client.get("/dashboard", headers=auth_headers)
+    
+    assert response.status_code == 200
+    data = response.json()
+    
+    assert data["grand_total"] == 8500.0
+    assert len(data["institutions"]) == 2
+    assert data["institutions"][0]["name"] == "Bank Alpha"
+    assert len(data["institutions"][0]["accounts"]) == 2
+    assert data["institutions"][1]["name"] == "Brokerage Beta"
+    assert len(data["institutions"][1]["accounts"]) == 1
+
+@patch("httpx.AsyncClient.get", new_callable=AsyncMock)
+def test_get_dashboard_with_as_of_date(mock_snaptrade_get, client, db_session, test_user, auth_headers):
+    conn = Connection(user_id=test_user.id, institution_name="Bank Gamma", status="active", snaptrade_connection_id="snap3")
+    db_session.add(conn)
+    db_session.commit()
+
+    # Mock accounts with different update times
+    now = datetime.utcnow()
+    two_days_ago = now - timedelta(days=2)
+    
+    mock_snaptrade_get.return_value = AsyncMock(status_code=200, json=lambda: [
+        {"id": "acc_now", "number": "n1", "balance": {"total": 100}, "meta": {"last_updated_at": now.isoformat()}},
+        {"id": "acc_old", "number": "n2", "balance": {"total": 200}, "meta": {"last_updated_at": two_days_ago.isoformat()}},
+    ])
+    
+    one_day_ago = now - timedelta(days=1)
+    
+    response = client.get(f"/dashboard?as_of_date={one_day_ago.strftime('%Y-%m-%d')}", headers=auth_headers)
+    
+    assert response.status_code == 200
+    data = response.json()
+    
+    assert len(data["institutions"]) == 1
+    assert len(data["institutions"][0]["accounts"]) == 1
+    assert data["institutions"][0]["accounts"][0]["snaptrade_account_id"] == "acc_old"
+    assert data["grand_total"] == 200
+
+@patch("httpx.AsyncClient.get", new_callable=AsyncMock)
+def test_dashboard_caching(mock_snaptrade_get, client, auth_headers, test_user, db_session):
+    conn = Connection(user_id=test_user.id, institution_name="Cache Bank", status="active", snaptrade_connection_id="snap_cache")
+    db_session.add(conn)
+    db_session.commit()
+
+    mock_response = AsyncMock(status_code=200, json=lambda: [{"id": "cached_acc", "balance": {"total": 1234}, "meta": {"last_updated_at": "2023-01-01T12:00:00Z"}}])
+    mock_snaptrade_get.return_value = mock_response
+
+    # First call - should hit the API
+    response1 = client.get("/dashboard", headers=auth_headers)
+    assert response1.status_code == 200
+    assert response1.json()["grand_total"] == 1234
+    mock_snaptrade_get.assert_called_once()
+
+    # Second call - should use cache
+    response2 = client.get("/dashboard", headers=auth_headers)
+    assert response2.status_code == 200
+    assert response2.json()["grand_total"] == 1234
+    mock_snaptrade_get.assert_called_once() 
+
+    # Third call with date - should bypass cache and hit API again
+    mock_snaptrade_get.return_value = AsyncMock(status_code=200, json=lambda: [{"id": "another_acc", "balance": {"total": 5678}, "meta": {"last_updated_at": "2022-12-31T12:00:00Z"}}])
+    response3 = client.get("/dashboard?as_of_date=2023-01-01", headers=auth_headers)
+    assert response3.status_code == 200
+    assert mock_snaptrade_get.call_count == 2
+    assert response3.json()["grand_total"] == 5678

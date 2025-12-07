@@ -1,6 +1,7 @@
 import React from 'react';
 
 interface Account {
+  snaptrade_account_id: string;
   masked_account_number: string;
   balance: number;
   currency: string;
@@ -10,51 +11,58 @@ interface Account {
 interface Institution {
   name: string;
   accounts: Account[];
-  sub_total: number;
 }
 
 interface ReportTableProps {
   institutions: Institution[];
 }
 
-export const ReportTable: React.FC<ReportTableProps> = ({ institutions }) => {
+const ReportTable: React.FC<ReportTableProps> = ({ institutions }) => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow h-full overflow-auto">
-      <h2 className="text-xl font-semibold mb-4">Account Report</h2>
-      {institutions.length === 0 ? (
-        <p>No account data available.</p>
-      ) : (
-        institutions.map((institution) => (
-          <div key={institution.name} className="mb-6">
-            <h3 className="text-lg font-bold mb-2">{institution.name}</h3>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">As of Date</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {institution.accounts.map((account, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{account.masked_account_number}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{account.balance.toFixed(2)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{account.currency}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(account.as_of_date).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">Subtotal</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{institution.sub_total.toFixed(2)}</td>
-                  <td colSpan={2}></td>
-                </tr>
-              </tbody>
-            </table>
+    <div className="flex flex-col gap-4">
+      {institutions.map((institution) => {
+        const subTotal = institution.accounts.reduce((acc, account) => acc + account.balance, 0);
+
+        return (
+          <div key={institution.name} className="bg-panel-light dark:bg-panel-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden">
+            <div className="p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50 dark:bg-white/5">
+              <h3 className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark tracking-tight">{institution.name}</h3>
+              <div className="text-right">
+                <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Sub-total</p>
+                <p className="font-bold text-lg text-text-primary-light dark:text-text-primary-dark">
+                  {subTotal.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD', // Assuming USD for sub-total for now
+                  })}
+                </p>
+              </div>
+            </div>
+            <div className="divide-y divide-border-light dark:divide-border-dark">
+              {institution.accounts.map((account) => (
+                <div key={account.snaptrade_account_id} className="grid grid-cols-3 gap-4 p-3 items-center">
+                  <div className="col-span-1">
+                    <p className="font-medium text-text-primary-light dark:text-text-primary-dark text-sm">{account.masked_account_number}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-base text-text-primary-light dark:text-text-primary-dark">
+                      {account.balance.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: account.currency,
+                      })}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">{new Date(account.as_of_date).toISOString().split('T')[0]}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        ))
-      )}
+        );
+      })}
     </div>
   );
 };
+
+export default ReportTable;
+

@@ -1,80 +1,111 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { SnapTradeConnect } from 'snaptrade-react';
 import { connectionsApi } from '../services/api';
-import { ConnectionCard } from '../components/ConnectionCard';
-import { useNotification } from '../context/NotificationContext'; // Import useNotification
+import ConnectionCard from '../components/ConnectionCard';
+import { useNotification } from '../context/NotificationContext';
 
 interface Connection {
   id: number;
   institution_name: string;
-  status: 'active' | 'inactive' | 'error';
+  status: string;
 }
 
-const ConnectionsPage: React.FC = () => {
+const ConnectionsPage = () => {
   const [connections, setConnections] = useState<Connection[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { showNotification } = useNotification(); // Use the notification hook
+  const [connectionData, setConnectionData] = useState<{ loginUrl: string; state: string } | null>(null);
+  const { showNotification } = useNotification();
+
+  const fetchConnections = useCallback(async () => {
+    try {
+      const data = await connectionsApi.getConnections();
+      setConnections(data);
+    } catch (error) {
+      // The error is already handled by the api interceptor
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchConnections = async () => {
-      try {
-        const data = await connectionsApi.getConnections();
-        setConnections(data);
-      } catch (err) {
-        showNotification('Failed to fetch connections.', 'error'); // Use notification
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchConnections();
-  }, [showNotification]); // Add showNotification to dependency array
+  }, [fetchConnections]);
 
-  const handleConnectInitiation = async () => {
+  const handleAddConnection = async () => {
     try {
-      const response = await connectionsApi.initiateConnection();
-      if (response.redirect_uri) {
-        window.location.href = response.redirect_uri;
-      } else {
-        showNotification("Failed to get redirect URI from SnapTrade.", 'error'); // Use notification
+      const data = await connectionsApi.initiateConnection();
+      if (data.redirect_uri && data.state) {
+        setConnectionData({ loginUrl: data.redirect_uri, state: data.state });
       }
-    } catch (err) {
-      showNotification("Failed to initiate connection with SnapTrade.", 'error'); // Use notification
-      console.error(err);
+    } catch (error) {
+      // The error is already handled by the api interceptor
     }
   };
+
+  const handleSuccess = useCallback(
+    async (authorizationId: string) => {
+      if (connectionData?.state) {
+        try {
+          await connectionsApi.handleConnectionCallback(authorizationId, connectionData.state);
+          setConnectionData(null); // Close the modal
+          showNotification('Connection successful!', 'success');
+          fetchConnections(); // Refresh the connections list
+        } catch (error) {
+          // The error is already handled by the api interceptor
+        }
+      } else {
+        showNotification('Invalid state. Could not complete connection.', 'error');
+      }
+    },
+    [connectionData, fetchConnections, showNotification]
+  );
+
+  const handleEvent = (event: any) => {
+    console.log('SnapTrade Event:', event);
+  };
+
+  const handleExit = () => {
+    console.log('SnapTrade exited');
+    setConnectionData(null); // Close the modal
+  };
+
+  if (connectionData) {
+    return (
+      <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl h-3/4">
+          <SnapTradeConnect
+            loginUrl={connectionData.loginUrl}
+            onSuccess={handleSuccess}
+            onEvent={handleEvent}
+            onExit={handleExit}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Connections</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Connections</h1>
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={handleConnectInitiation}
+          onClick={handleAddConnection}
+          className="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300"
         >
-          Add New Connection
+          Add Connection
         </button>
       </div>
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search connections..."
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      {loading && <p>Loading connections...</p>}
-      {/* Removed local error display, global notification handles it */}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {connections.map((conn) => (
-          <ConnectionCard key={conn.id} connection={conn} onConnectClick={handleConnectInitiation} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {connections.map((connection) => (
+          <ConnectionCard key={connection.id} connection={connection} />
         ))}
-        {!loading && connections.length === 0 && ( // Removed !error check
-          <p>No connections found. Click "Add New Connection" to get started.</p>
-        )}
       </div>
+      {connections.length === 0 && (
+        <div className="text-center py-12 text-gray-500">
+          <p>No connections yet.</p>
+          <p>Click "Add Connection" to get started.</p>
+        </div>
+      )}
     </div>
   );
 };
 
 export default ConnectionsPage;
+

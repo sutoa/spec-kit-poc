@@ -1,9 +1,8 @@
 import axios from 'axios';
-import { authService } from './authService';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -12,7 +11,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = authService.getToken();
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -72,5 +71,3 @@ export const dashboardApi = {
     return response.data;
   },
 };
-
-// Add other API functions as needed for Dashboard, etc.
