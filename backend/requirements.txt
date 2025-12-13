@@ -1,14 +1,8 @@
 fastapi
-python-multipart
 uvicorn[standard]
-pydantic==1.10.13
+pydantic
 sqlalchemy
 python-dotenv
-passlib==1.7.4
-bcrypt==4.0.1
-python-jose[cryptography]
-httpx
 pytest
+httpx
 pytest-mock
-cachetools
-freezegun

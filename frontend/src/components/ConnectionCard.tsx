@@ -1,36 +1,48 @@
-
-
-
-
-import { Connection } from '../types/connection';
+import React from 'react';
+import { connectInstitution } from '../services/api';
 
 interface ConnectionCardProps {
-  connection: Connection;
+  institution: {
+    id: string;
+    name: string;
+    status: string;
+  };
 }
 
-const ConnectionCard: React.FC<ConnectionCardProps> = ({ connection }) => {
-  const statusClasses = {
-    active: 'bg-green-100 text-green-800',
-    error: 'bg-red-100 text-red-800',
-    disconnected: 'bg-gray-100 text-gray-800',
+const ConnectionCard: React.FC<ConnectionCardProps> = ({ institution }) => {
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
+
+  const handleConnect = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await connectInstitution(institution.id);
+      if (data.redirect_uri) {
+        window.location.href = data.redirect_uri;
+      }
+    } catch (error: any) {
+      setError(error);
+      console.error('Error connecting to institution:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const statusClass = statusClasses[connection.status] || statusClasses.disconnected;
-
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col justify-between">
-      <div>
-        <h2 className="text-xl font-bold text-gray-800 mb-2">{connection.institution_name}</h2>
-        <div className="flex items-center">
-          <span className={`px-3 py-1 text-sm font-semibold rounded-full ${statusClass}`}>
-            {connection.status}
-          </span>
-        </div>
-      </div>
-      <div className="mt-6 flex justify-end space-x-2">
-        <button className="text-sm text-gray-500 hover:text-gray-700">Refresh</button>
-        <button className="text-sm text-red-500 hover:text-red-700">Delete</button>
-      </div>
+    <div className="border p-4 rounded-lg">
+      <h2 className="text-lg font-bold">{institution.name}</h2>
+      <p>Status: {institution.status}</p>
+      {institution.status !== 'connected' && (
+        <button
+          onClick={handleConnect}
+          disabled={loading}
+          className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          {loading ? 'Connecting...' : 'Connect'}
+        </button>
+      )}
+      {error && <p className="text-red-500 mt-2">{error.message}</p>}
     </div>
   );
 };

@@ -25,22 +25,22 @@ These tasks focus on initializing the project structure, installing dependencies
 - [X] T004 Initialize frontend React+TypeScript project using Vite in `frontend/`
 - [X] T005 Run `npm install` in `frontend/` and add dev dependencies: `tailwindcss`, `postcss`, `autoprefixer`
 - [X] T006 Configure Tailwind CSS in `frontend/tailwind.config.js` and `frontend/postcss.config.js`
-- [ ] T007 Create initial database schema and connection logic in `backend/app/database.py`
+- [X] T007 Create initial database schema and connection logic in `backend/app/database.py`
 
 ## Phase 2: [US2] Connection Management
 
 This phase focuses on implementing the ability for users to connect their financial institution accounts.
 
-- [ ] T008 [US2] Implement Institution and Account models in `backend/app/models.py`
-- [ ] T009 [US2] Implement Institution and Account schemas in `backend/app/schemas.py`
-- [ ] T010 [US2] Implement CRUD operations for Institutions and Accounts in `backend/app/crud.py`
-- [ ] T011 [US2] Implement `/institutions` GET endpoint in `backend/app/main.py` to list all institutions
-- [ ] T012 [US2] Implement `/snaptrade/connect` POST endpoint in `backend/app/main.py` to initiate SnapTrade connection and return the `redirect_uri`
-- [ ] T013 [US2] Implement `/snaptrade/callback` POST endpoint in `backend/app/main.py` to handle SnapTrade's success callback
-- [ ] T014 [US2] Create `ConnectionsPage.tsx` component in `frontend/src/pages/ConnectionsPage.tsx`
-- [ ] T015 [US2] Create `ConnectionCard.tsx` component in `frontend/src/components/ConnectionCard.tsx` to display institution details and status
-- [ ] T016 [P] [US2] Implement frontend logic in `ConnectionsPage.tsx` to fetch and display connections from the API
-- [ ] T017 [P] [US2] Implement frontend logic to call `/snaptrade/connect` and use the SnapTrade React SDK to handle the connection flow
+- [X] T008 [US2] Implement Institution and Account models in `backend/app/models.py`
+- [X] T009 [US2] Implement Institution and Account schemas in `backend/app/schemas.py`
+- [X] T010 [US2] Implement CRUD operations for Institutions and Accounts in `backend/app/crud.py`
+- [X] T011 [US2] Implement /institutions GET endpoint in `backend/app/main.py` to list all institutions
+- [X] T012 [US2] Implement /snaptrade/connect POST endpoint in `backend/app/main.py` to initiate SnapTrade connection and return the `redirect_uri`
+- [X] T013 [US2] Implement /snaptrade/callback POST endpoint in `backend/app/main.py` to handle SnapTrade's success callback
+- [X] T014 [US2] Create `ConnectionsPage.tsx` component in `frontend/src/pages/ConnectionsPage.tsx`
+- [X] T015 [US2] Create `ConnectionCard.tsx` component in `frontend/src/components/ConnectionCard.tsx` to display institution details and status
+- [X] T016 [P] [US2] Implement frontend logic in `ConnectionsPage.tsx` to fetch and display connections from the API
+- [X] T017 [P] [US2] Implement frontend logic to call /snaptrade/connect and use the SnapTrade React SDK to handle the connection flow
 - [ ] T018 [US2] Write backend tests for Connection endpoints in `backend/tests/test_connections.py`
 
 ## Phase 3: [US1] Dashboard View

@@ -1,47 +1,35 @@
-from typing import Optional
 from sqlalchemy.orm import Session
-from . import models, schemas, security
-from .config import settings
-import httpx
 
-def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+from . import models, schemas
 
-def get_user_by_username(db: Session, username: str):
-    return db.query(models.User).filter(models.User.username == username).first()
 
-def create_user(db: Session, user: schemas.UserCreate, snaptrade_user_id: Optional[str] = None, snaptrade_user_secret: Optional[str] = None):
-    if snaptrade_user_id and snaptrade_user_secret:
-        # Bypass SnapTrade API call if values are provided
-        snaptrade_data = {"userId": snaptrade_user_id, "userSecret": snaptrade_user_secret}
-    else:
-        # Register user with SnapTrade
-        with httpx.Client() as client:
-            response = client.post(
-                "https://api.snaptrade.com/api/v1/snaptrade/register",
-                json={"clientId": settings.snaptrade_client_id, "userId": user.username},
-            )
-            response.raise_for_status()
-            snaptrade_data = response.json()
+def get_institution(db: Session, institution_id: int):
+    return db.query(models.Institution).filter(models.Institution.id == institution_id).first()
 
-    hashed_password = security.get_password_hash(user.password)
-    db_user = models.User(
-        username=user.username,
-        hashed_password=hashed_password,
-        snaptrade_user_id=snaptrade_data["userId"],
-        snaptrade_user_secret=snaptrade_data["userSecret"],
-    )
-    db.add(db_user)
+
+def get_institution_by_external_id(db: Session, external_id: str):
+    return db.query(models.Institution).filter(models.Institution.external_id == external_id).first()
+
+
+def get_institutions(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Institution).offset(skip).limit(limit).all()
+
+
+def create_institution(db: Session, institution: schemas.InstitutionCreate):
+    db_institution = models.Institution(**institution.dict())
+    db.add(db_institution)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(db_institution)
+    return db_institution
 
-def get_connections(db: Session, user_id: int, skip: int = 0, limit: int = 100):
-    return db.query(models.Connection).filter(models.Connection.user_id == user_id).offset(skip).limit(limit).all()
 
-def create_connection(db: Session, connection: schemas.ConnectionCreate, user_id: int):
-    db_connection = models.Connection(**connection.dict(), user_id=user_id)
-    db.add(db_connection)
+def get_accounts(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Account).offset(skip).limit(limit).all()
+
+
+def create_institution_account(db: Session, account: schemas.AccountCreate, institution_id: int):
+    db_account = models.Account(**account.dict(), institution_id=institution_id)
+    db.add(db_account)
     db.commit()
-    db.refresh(db_connection)
-    return db_connection
+    db.refresh(db_account)
+    return db_account
