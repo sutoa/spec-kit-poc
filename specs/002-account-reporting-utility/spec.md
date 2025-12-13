@@ -120,11 +120,7 @@ The user interface and user experience MUST be implemented to be a "pixel-perfec
 -   **FR-017**: The 'Refresh Data' button on the dashboard MUST be disabled if no institutions are connected.
 -   **FR-018**: When a connection attempt fails, the system MUST display a specific error message to the user, and the institution's status in the Connections list MUST be updated to reflect the failure.
 -   **FR-019**: The dashboard report MUST display actual balance amounts and institution names as retrieved from the connected financial institutions.
--   **FR-020**: The system MUST implement a JWT-based authentication system using short-lived access tokens (e.g., 15 minutes expiration) and long-lived refresh tokens. The backend MUST generate and validate these tokens, and the frontend MUST manage their refresh securely.
--   **FR-021**: The backend MUST implement anti-CSRF token validation for all state-changing API endpoints.
 -   **FR-022**: The system MUST sanitize all user-provided input and escape all data before rendering it in the UI to prevent XSS attacks.
--   **FR-023**: The application MUST utilize secure HTTP headers, including a strict Content Security Policy (CSP), to mitigate XSS and other injection attacks.
--   **FR-024**: If cookies are used for session management, they MUST be configured with `HttpOnly`, `Secure`, and `SameSite=Strict` flags.
 -   **FR-025**: For the MVP, the application MUST be designed for desktop browsers only; mobile and tablet support are explicitly out of scope.
 -   **FR-026**: The application MUST adhere to the Principle of Least Privilege by requesting only essential account information (balance amounts and their associated as-of dates) from SnapTrade.
 -   **FR-027**: The list of financial institutions on the 'Connections' page MUST be sorted alphabetically by institution name, with all connected institutions appearing before disconnected institutions.
@@ -137,6 +133,7 @@ The user interface and user experience MUST be implemented to be a "pixel-perfec
 ### Out of Scope / Post-MVP
 
 -   A list of checkboxes for institutions in the dashboard filter section will be implemented post-MVP. For the MVP, the dashboard will report on all connected institutions.
+-   Accessibility features (e.g., screen reader compatibility, keyboard navigation enhancements) are deferred to a future release.
 -   API rate limiting (e.g., per-user or IP-based limits) will be deferred to a future release.
 -   Validating the authenticity of SnapTrade callbacks (e.g., via signature checking) is deferred to a future release. **[CRITICAL RISK - ACCEPTED]**: This introduces a security vulnerability where a malicious actor could spoof callback requests.
 
@@ -144,10 +141,12 @@ The user interface and user experience MUST be implemented to be a "pixel-perfec
 
 -   **ASM-001**: For the initial version, the system assumes all connected financial accounts are denominated in United States Dollars (USD).
 
+-   **ASM-002**: For the MVP, the system is designed to handle less than 10 institutions and 30 accounts per user.
+
 ### Key Entities
 
--   **Account**: Represents a financial account. Key attributes include: masked account number, balance, as-of date, and associated institution.
--   **Institution**: Represents a financial institution. Key attributes include: name and connection status.
+-   **Account**: Represents a financial account. Key attributes include: unique `external_id` (from external API), masked account number, balance, as-of date, and associated institution.
+-   **Institution**: Represents a financial institution. Key attributes include: unique `external_id` (from external API), name and connection status (can be one of: `connected`, `disconnected`, `error`, `pending`).
 -   **Dashboard**: A consolidated view of account information.
 
 ## Success Criteria
@@ -160,6 +159,16 @@ The user interface and user experience MUST be implemented to be a "pixel-perfec
 -   **SC-004**: The system minimizes the use of paid APIs, favoring cost-effective solutions for at least 80% of integrated institutions.
 
 ## Clarifications
+
+### Session 2025-12-13
+- Q: Should the Account Viewer application (not the institution connection process) have user authentication in the MVP? → A: No, assume a single user for the MVP. Remove FR-020, FR-021, FR-023, FR-024.
+- Q: What are the unique identifiers for "Account" and "Institution" entities, and how are duplicates handled if they appear in source data? → A: Institution: `external_id`, Account: `external_id` - these IDs should be unique and provided by the external API. Duplicates are not expected.
+
+- Q: What are the possible states for an institution's connection status? → A: Use states: `connected`, `disconnected`, `error`, `pending` (for in-progress connections).
+
+- Q: What are the requirements for accessibility and localization? → A: Defer all accessibility work to post-MVP. The focus will be solely on the functional requirements.
+
+- Q: What are the data volume and scale assumptions for the MVP? → A: For MVP, assume less than 10 institutions and 30 accounts per user.
 
 ### Session 2025-11-30
 - Q: What should the dashboard display when a user views it for the very first time? → A: An empty state that instructs the user to go to the "Connections" page to add an institution. The 'Refresh' button should be disabled if there is no active connection.

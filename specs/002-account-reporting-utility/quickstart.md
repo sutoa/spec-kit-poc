@@ -1,74 +1,59 @@
-# Quickstart: Account Reporting Utility
+# Quickstart
 
-This guide provides the steps to set up and run the project locally for development.
+This document provides instructions on how to set up and run the Account Reporting Utility.
 
 ## Prerequisites
 
 -   Python 3.11+
--   Node.js 18+ and npm
--   An account with SnapTrade to get API credentials.
+-   Node.js and npm
 
-## 1. Backend Setup
-
-### Installation
+## Backend
 
 1.  **Navigate to the backend directory:**
     ```bash
     cd backend
     ```
 
-2.  **Create and activate a virtual environment:**
+2.  **Create a virtual environment:**
     ```bash
-    python3 -m venv venv
-    source venv/bin/activate
+    python -m venv venv
     ```
 
-3.  **Install dependencies:**
+3.  **Activate the virtual environment:**
+    -   On macOS and Linux:
+        ```bash
+        source venv/bin/activate
+        ```
+    -   On Windows:
+        ```bash
+        venv\Scripts\activate
+        ```
+
+4.  **Install the dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
-    *(Note: `requirements.txt` will be created during implementation)*
 
-### Configuration
-
-1.  Create a `.env` file in the `backend` directory.
-2.  Add your SnapTrade API credentials to the `.env` file:
-    ```
-    SNAPTRADE_CLIENT_ID=your_client_id
-    SNAPTRADE_CLIENT_SECRET=your_client_secret
-    ```
-
-### Running the Backend
-
-1.  **Start the FastAPI server:**
+5.  **Run the application:**
     ```bash
     uvicorn app.main:app --reload
     ```
-    The API will be available at `http://127.0.0.1:8000`.
+    The backend will be running at `http://127.0.0.1:8000`.
 
-## 2. Frontend Setup
-
-### Installation
+## Frontend
 
 1.  **Navigate to the frontend directory:**
     ```bash
     cd frontend
     ```
 
-2.  **Install dependencies:**
+2.  **Install the dependencies:**
     ```bash
     npm install
     ```
-    *(Note: The React project will be set up during implementation)*
 
-### Running the Frontend
-
-1.  **Start the development server:**
+3.  **Run the application:**
     ```bash
-    npm start
+    npm run dev
     ```
-    The application will be available at `http://localhost:3000`.
-
-## 3. Database
-
-The backend uses SQLite for local development. The database file (`development.db`) will be created automatically in the `backend` directory when the application is first run.
+    The frontend will be running at `http://localhost:5173` (or another port if 5173 is in use).

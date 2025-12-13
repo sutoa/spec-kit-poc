@@ -1,51 +1,30 @@
-# Data Model: Account Reporting Utility
+# Data Model
 
-This document defines the database schema for the application.
+This data model is based on the entities defined in the feature specification.
 
-## 1. User
+## Entities
 
-Represents a user of the application.
+### Institution
 
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | INTEGER | Primary Key |
-| `username` | TEXT | The user's unique username. |
-| `hashed_password` | TEXT | The user's hashed password. |
-| `snaptrade_user_id` | TEXT | The user's ID from SnapTrade. |
-| `snaptrade_user_secret` | TEXT | The user's secret from SnapTrade. |
-| `created_at` | TIMESTAMP | The timestamp when the user was created. |
+Represents a financial institution.
 
-## 2. Connection
+-   **id**: `integer` (primary key)
+-   **external_id**: `string` (unique identifier from the external API)
+-   **name**: `string`
+-   **status**: `string` (one of: `connected`, `disconnected`, `error`, `pending`)
 
-Represents a user's connection to a financial institution via the SnapTrade aggregator.
+### Account
 
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | INTEGER | Primary Key |
-| `user_id` | INTEGER | Foreign Key to the `User` table. |
-| `snaptrade_connection_id` | TEXT | The unique ID for this connection from SnapTrade. |
-| `institution_name` | TEXT | The name of the financial institution. |
-| `status` | TEXT | The current status of the connection (e.g., 'active', 'error'). |
-| `created_at` | TIMESTAMP | The timestamp when the connection was established. |
+Represents a financial account.
 
-## 3. Account
-
-Represents a specific financial account retrieved from a connection. This data is cached and not intended to be the permanent source of truth.
-
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | INTEGER | Primary Key |
-| `connection_id` | INTEGER | Foreign Key to the `Connection` table. |
-| `snaptrade_account_id` | TEXT | The unique ID for this account from SnapTrade. |
-| `masked_account_number` | TEXT | The masked account number (e.g., '...1234'). |
-| `balance` | REAL | The account balance. |
-| `currency` | TEXT | The currency of the balance (e.g., 'USD'). |
-| `as_of_date` | TIMESTAMP | The date the balance was recorded by the institution. |
-| `last_updated` | TIMESTAMP | The timestamp when this account data was last fetched. |
+-   **id**: `integer` (primary key)
+-   **external_id**: `string` (unique identifier from the external API)
+-   **masked_account_number**: `string`
+-   **balance**: `float`
+-   **as_of_date**: `date`
+-   **institution_id**: `integer` (foreign key to `Institution.id`)
 
 ## Relationships
 
--   A `User` can have many `Connection`s.
--   A `Connection` belongs to one `User`.
--   A `Connection` can have many `Account`s.
--   An `Account` belongs to one `Connection`.
+-   An **Institution** can have multiple **Accounts**.
+-   An **Account** belongs to one **Institution**.

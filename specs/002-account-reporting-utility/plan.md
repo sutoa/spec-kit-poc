@@ -1,85 +1,75 @@
 # Implementation Plan: Account Reporting Utility
 
-This document outlines the technical plan for implementing the Account Reporting Utility feature, as specified in `spec.md`.
+**Branch**: `002-account-reporting-utility` | **Date**: 2025-12-13 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `/specs/002-account-reporting-utility/spec.md`
 
-## 1. Technical Context
+## Summary
 
-This section defines the architectural approach and technology stack for the project.
+This plan outlines the implementation of the Account Reporting Utility. The primary requirement is to build a web application that allows a user to connect to financial institutions, and view a consolidated report of their accounts. The technical approach involves a Python/FastAPI backend and a TypeScript/React frontend.
 
--   **Architectural Approach**: A monolithic repository containing a `frontend` React SPA and a `backend` Python REST API. The backend will manage business logic, database interactions, and communication with a third-party financial data aggregator. The frontend will present the user interface for the dashboard and connection management.
+## Technical Context
 
--   **Frontend**:
-    -   **Framework**: React with TypeScript
-    -   **Styling**: Tailwind CSS. This choice ensures a "pixel-perfect" implementation that precisely matches the provided UI mockups in `specs/002-account-reporting-utility/screens/`.
-    -   **State Management**: React Context or Zustand for managing application state.
+**Language/Version**: Python 3.11+, TypeScript/ES2022
+**Primary Dependencies**:
+- **Backend**: FastAPI, SQLAlchemy, Uvicorn, Pydantic
+- **Frontend**: React, Vite, Axios, Tailwind CSS, SnapTrade React SDK
+**Storage**: SQLite (for local development and MVP)
+**Testing**: Pytest
+**Target Platform**: Desktop web browsers
+**Project Type**: Web application (frontend/backend)
+**Performance Goals**: Initial dashboard load < 10 seconds; subsequent refreshes < 3 seconds.
+**Constraints**: MVP is for desktop browsers only. No user authentication for the application itself.
+**Scale/Scope**: MVP to support < 10 institutions and < 30 accounts per user.
 
--   **Backend**:
-    -   **Framework**: Python with FastAPI for a high-performance REST API.
-    -   **Data Validation**: Pydantic (built into FastAPI).
+## Constitution Check
 
--   **Database**:
-    -   **Development**: SQLite for simplicity and ease of setup.
-    -   **Production**: Can be migrated to a more robust database like PostgreSQL if needed.
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
--   **Financial Data Aggregation**:
-    -   **Primary Choice**: SnapTrade. This decision is based on the research documented in `research.md`, which concluded its free tier and focus on investment accounts are the best fit for this project's requirements.
+*No constitution file found. Skipping gate check.*
 
-## 2. Constitution Check
+## Project Structure
 
--   **Simplicity and Maintainability**: The chosen stack (React, FastAPI, Tailwind CSS) promotes clean, modern, and maintainable code. The architecture is straightforward.
--   **Test-Driven Development (TDD)**: Both frontend (with Jest/React Testing Library) and backend (with Pytest) have mature testing frameworks available. Tests will be required for all new functionality.
--   **User Experience (UX) Focus**: The choice of React with Tailwind CSS allows for building a custom, highly interactive, and polished user experience that is a pixel-perfect match for the design mockups.
--   **Performance Optimization**: FastAPI is known for its high performance. Frontend performance will be monitored, and the spec includes performance-related success criteria.
+### Documentation (this feature)
 
-**Gate Check**: No constitutional violations identified at this stage.
+```text
+specs/002-account-reporting-utility/
+├── plan.md              # This file (/speckit.plan command output)
+├── research.md          # Phase 0 output (/speckit.plan command)
+├── data-model.md        # Phase 1 output (/speckit.plan command)
+├── quickstart.md        # Phase 1 output (/speckit.plan command)
+├── contracts/           # Phase 1 output (/speckit.plan command)
+│   └── openapi.yaml
+└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+```
 
-## 3. Phase 0: Outline & Research
+### Source Code (repository root)
+```text
+backend/
+├── app/
+│   ├── crud.py
+│   ├── database.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── main.py
+│   └── services/
+└── tests/
 
-This phase focuses on resolving the "NEEDS CLARIFICATION" items from the technical context. The results will be documented in `research.md`.
+frontend/
+├── src/
+│   ├── components/
+│   ├── context/
+│   ├── pages/
+│   ├── services/
+│   └── types/
+└── tests/
+```
 
--   **Task 1**: Research and compare financial data aggregators (SnapTrade, Plaid, Yodlee) based on the following criteria:
-    -   **Institution Coverage**: Support for Fidelity, Vanguard, Janus, TRowe Price, UBS, and Goldman Sachs 401K.
-    -   **Pricing**: Emphasis on free or low-cost tiers for personal use.
-    -   **API & Documentation**: Ease of integration and quality of developer documentation.
-    -   **Connection Method**: Analyze the best approach for implementing the connection portal, specifically for SnapTrade as requested (`https://docs.snaptrade.com/docs/implement-connection-portal`).
+**Structure Decision**: The project already has a clear `frontend` and `backend` directory structure, which will be used for the implementation.
 
--   **Task 2**: Research best practices for building an application with a React frontend and a FastAPI backend, focusing on:
-    -   Project structure.
-    -   CORS (Cross-Origin Resource Sharing) management.
-    -   Authentication flow between frontend and backend.
+## Complexity Tracking
 
--   **Task 3**: Research best practices for securely caching financial data retrieved from the aggregator to meet the performance requirements for subsequent refreshes.
+> **Fill ONLY if Constitution Check has violations that must be justified**
 
-## 4. Phase 1: Design & Contracts
-
-Based on the research, this phase will produce the core design artifacts.
-
--   **Data Model (`data-model.md`)**: Define the database schema for `User`, `Connection`, and `Account` entities.
--   **API Contracts (`contracts/openapi.yaml`)**: Create an OpenAPI 3.0 specification for the backend REST API.
--   **Quickstart (`quickstart.md`)**: A guide to set up and run the project locally.
-
-## 5. Phase 2: Implementation & Testing
-
-This phase involves writing the code, but the detailed task breakdown will be generated by a separate command after the plan is approved.
-
--   **Backend**:
-    -   Set up FastAPI application.
-    -   Implement API endpoints defined in `openapi.yaml`.
-    -   Integrate with the chosen financial data aggregator.
-    -   Implement database models and business logic.
--   **Frontend**:
-    -   Set up React application and configure Tailwind CSS.
-    -   Build a component-based UI that is a pixel-perfect match to the mockups. The component architecture will include:
-        -   **`Layout`**: Main application wrapper containing shared elements like the side navigation and header.
-        -   **`SideNav`**: The collapsible left navigation panel.
-        -   **`Header`**: The top bar displaying page titles, action buttons, and user information.
-        -   **`DashboardPage`**: The page component for the dashboard.
-        -   **`ConnectionsPage`**: The page component for connection management.
-        -   **`ConnectionCard`**: A reusable card to display an institution on the `ConnectionsPage`.
-        -   **`DashboardFilterPanel`**: The filter panel on the `DashboardPage`.
-        -   **`ReportTable`**: The component for displaying the financial report on the `DashboardPage`.
-        -   **`StatCard`**: A reusable card for high-level metrics (e.g., "Grand Total").
-    -   Implement state management and API client to communicate with the backend.
--   **Testing**:
-    -   Write unit and integration tests for both frontend and backend.
-    -   Perform end-to-end testing to verify user scenarios.
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|-------------------------------------|
+| *N/A*     | *N/A*      | *N/A*                               |
