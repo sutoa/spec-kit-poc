@@ -1,17 +1,11 @@
-import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import DashboardPage from './pages/DashboardPage';
 import ConnectionsPage from './pages/ConnectionsPage';
 import { NotificationProvider, useNotification } from './context/NotificationContext';
-import { setupInterceptors } from './services/api';
 
 const AppContent = () => {
   const { showNotification } = useNotification();
-
-  useEffect(() => {
-    setupInterceptors(showNotification);
-  }, [showNotification]);
 
   return (
     <Routes>

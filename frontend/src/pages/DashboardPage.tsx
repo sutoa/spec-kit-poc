@@ -3,6 +3,7 @@ import { getDashboardData } from '../services/api';
 import ReportTable from '../components/ReportTable';
 import StatCard from '../components/StatCard';
 import DashboardFilterPanel from '../components/DashboardFilterPanel';
+import { useNotification } from '../context/NotificationContext'; // Import useNotification
 
 interface Account {
   masked_account_number: string;
@@ -29,6 +30,7 @@ const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [asOfDate, setAsOfDate] = useState<string | undefined>(undefined);
+  const { showNotification } = useNotification(); // Use notification context
 
   const fetchDashboard = async (date?: string) => {
     setLoading(true);
@@ -36,8 +38,12 @@ const DashboardPage: React.FC = () => {
     try {
       const data = await getDashboardData(date);
       setDashboardData(data);
+      showNotification("Dashboard data refreshed successfully!", "success");
     } catch (err: any) {
-      setError(err.message || "Failed to fetch dashboard data");
+      const errorMessage = err.message || "Failed to fetch dashboard data";
+      setError(errorMessage);
+      showNotification(errorMessage, "error");
+      console.error("Error fetching dashboard data:", err);
     } finally {
       setLoading(false);
     }
@@ -55,21 +61,42 @@ const DashboardPage: React.FC = () => {
     fetchDashboard(asOfDate);
   };
 
-  if (loading) return <div>Loading dashboard...</div>;
-  if (error) return <div className="text-red-500">Error: {error}</div>;
-  if (!dashboardData) return <div>No dashboard data available.</div>;
+  if (loading) return (
+    <div className="flex-1 p-8 bg-background-light dark:bg-background-dark">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold mb-4 text-text-primary-light dark:text-text-primary-dark">Consolidated Account Report</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div className="bg-panel-light dark:bg-panel-dark p-6 rounded-xl border border-border-light dark:border-border-dark animate-pulse h-32"></div>
+          <div className="bg-panel-light dark:bg-panel-dark p-6 rounded-xl border border-border-light dark:border-border-dark animate-pulse h-32"></div>
+          <div className="bg-panel-light dark:bg-panel-dark p-6 rounded-xl border border-border-light dark:border-border-dark animate-pulse h-32"></div>
+        </div>
+        <div className="bg-panel-light dark:bg-panel-dark rounded-xl border border-border-light dark:border-border-dark animate-pulse h-64"></div>
+      </div>
+    </div>
+  );
+  if (error) return <div className="text-red-500 p-8">Error: {error}</div>;
+  if (!dashboardData || dashboardData.institutions.length === 0) return (
+    <div className="flex-1 p-8 bg-background-light dark:bg-background-dark text-center text-text-secondary-light dark:text-text-secondary-dark">
+      <h1 className="text-2xl font-bold mb-4">Consolidated Account Report</h1>
+      <p>No connected institutions found. Please connect an institution to view your dashboard.</p>
+      {/* Optionally, add a link to connections page */}
+    </div>
+  );
 
   return (
-    <div className="flex">
-      <DashboardFilterPanel onDateChange={handleDateChange} onRefresh={handleRefresh} />
-      <div className="flex-grow p-4">
-        <h1 className="text-2xl font-bold mb-4">Consolidated Account Report</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <StatCard title="Grand Total" value={`$${dashboardData.grand_total.toFixed(2)}`} />
-          <StatCard title="Total Institutions" value={dashboardData.institutions.length} />
+    <div className="flex flex-1 overflow-hidden">
+      <aside className="w-80 flex-shrink-0 bg-panel-light dark:bg-panel-dark border-r border-border-light dark:border-border-dark flex flex-col p-6">
+        <DashboardFilterPanel onDateChange={handleDateChange} onRefresh={handleRefresh} />
+      </aside>
+      <section className="flex-1 bg-background-light dark:bg-background-dark p-8 overflow-y-auto">
+        <div className="max-w-4xl mx-auto flex flex-col gap-6">
+          <div className="flex flex-col gap-6">
+            <StatCard title="Grand Total" value={`$${dashboardData.grand_total.toFixed(2)}`} valueClassName="text-5xl" />
+            <StatCard title="Total Institutions" value={dashboardData.institutions.length} valueClassName="text-4xl" />
+          </div>
+          <ReportTable institutions={dashboardData.institutions} grandTotal={dashboardData.grand_total} />
         </div>
-        <ReportTable institutions={dashboardData.institutions} grandTotal={dashboardData.grand_total} />
-      </div>
+      </section>
     </div>
   );
 };

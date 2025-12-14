@@ -19,32 +19,33 @@ interface ReportTableProps {
 
 const ReportTable: React.FC<ReportTableProps> = ({ institutions, grandTotal }) => {
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Account Report</h2>
+    <div className="flex flex-col gap-4">
       {institutions.map((institution) => (
-        <div key={institution.name} className="mb-6">
-          <h3 className="text-lg font-semibold">{institution.name} (Subtotal: ${institution.sub_total.toFixed(2)})</h3>
-          <table className="min-w-full bg-white border border-gray-200">
-            <thead>
-              <tr>
-                <th className="py-2 px-4 border-b">Account Number</th>
-                <th className="py-2 px-4 border-b">Balance</th>
-                <th className="py-2 px-4 border-b">As of Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {institution.accounts.map((account, index) => (
-                <tr key={index}>
-                  <td className="py-2 px-4 border-b">{account.masked_account_number}</td>
-                  <td className="py-2 px-4 border-b">${account.balance.toFixed(2)}</td>
-                  <td className="py-2 px-4 border-b">{account.as_of_date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div key={institution.name} className="bg-panel-light dark:bg-panel-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden">
+          <div className="p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50 dark:bg-white/5">
+            <h3 className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark tracking-tight">{institution.name}</h3>
+            <div className="text-right">
+              <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Sub-total</p>
+              <p className="font-bold text-lg text-text-primary-light dark:text-text-primary-dark">${institution.sub_total.toFixed(2)}</p>
+            </div>
+          </div>
+          <div className="divide-y divide-border-light dark:divide-border-dark">
+            {institution.accounts.map((account, index) => (
+              <div key={index} className="grid grid-cols-4 gap-4 p-3 items-center">
+                <div className="col-span-2">
+                  {/* Mock account type for now */}
+                  <p className="font-medium text-text-primary-light dark:text-text-primary-dark text-sm">Brokerage Account</p> 
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark font-mono">{account.masked_account_number}</p>
+                </div>
+                <div className="text-right col-span-2"> {/* Changed to col-span-2 to match mockup layout */}
+                  <p className="font-medium text-base text-text-primary-light dark:text-text-primary-dark">${account.balance.toFixed(2)}</p>
+                  <p className="text-[10px] text-text-secondary-light dark:text-text-secondary-dark">as of {account.as_of_date}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ))}
-      <h2 className="text-xl font-bold mt-6">Grand Total: ${grandTotal.toFixed(2)}</h2>
     </div>
   );
 };

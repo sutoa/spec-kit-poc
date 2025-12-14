@@ -1,4 +1,4 @@
-import { getInstitutions, connectInstitution } from './api';
+import { getInstitutions, connectInstitution, getDashboardData } from './api';
 import axios from 'axios';
 import { vi } from 'vitest';
 

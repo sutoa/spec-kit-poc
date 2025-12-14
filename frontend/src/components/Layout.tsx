@@ -13,7 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       <SideNav />
       <div className="flex-1 flex flex-col">
         <Header title={title} />
-        <main className="flex-1 overflow-y-auto bg-gray-100">
+        <main className="flex-1 overflow-auto bg-background-light dark:bg-background-dark">
           {children}
         </main>
       </div>
