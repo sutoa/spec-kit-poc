@@ -7,8 +7,10 @@
 - Prioritize maintainability and long-term viability over short-term gains.
 
 ### II. Test-Driven Development (TDD)
-- All new features and bug fixes must be accompanied by comprehensive tests.
-- Aim for high test coverage for critical components.
+- **Mandatory Testing**: All new features and bug fixes, for both backend and frontend components, *must* be accompanied by a comprehensive suite of tests.
+- **Test Coverage**: Strive for high test coverage, especially for critical business logic, API endpoints, and complex UI components.
+- **Test Types**: Implement unit tests for individual functions/components, integration tests for component interactions and API flows, and end-to-end (E2E) tests for critical user journeys.
+- **TDD Workflow**: Adopt a Test-Driven Development approach: write failing tests *before* writing the code necessary to make them pass, then refactor.
 
 ### III. User Experience (UX) Focus
 - Design decisions must prioritize a seamless and intuitive user experience.
