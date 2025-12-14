@@ -4,15 +4,16 @@ import Header from './Header';
 
 interface LayoutProps {
   children: React.ReactNode;
+  title: string;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   return (
-    <div className="flex h-screen bg-background-light dark:bg-background-dark font-display">
+    <div className="flex h-screen">
       <SideNav />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto">
+      <div className="flex-1 flex flex-col">
+        <Header title={title} />
+        <main className="flex-1 overflow-y-auto bg-gray-100">
           {children}
         </main>
       </div>
@@ -21,4 +22,3 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 };
 
 export default Layout;
-

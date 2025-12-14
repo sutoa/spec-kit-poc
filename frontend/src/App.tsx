@@ -1,11 +1,8 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-// import ProtectedRoute from './components/ProtectedRoute';
 import DashboardPage from './pages/DashboardPage';
 import ConnectionsPage from './pages/ConnectionsPage';
-import LoginPage from './pages/LoginPage';
-// import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider, useNotification } from './context/NotificationContext';
 import { setupInterceptors } from './services/api';
 
@@ -18,11 +15,10 @@ const AppContent = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
       <Route
-        path="/"
+        path="/dashboard"
         element={
-          <Layout>
+          <Layout title="Consolidated Account Report">
             <DashboardPage />
           </Layout>
         }
@@ -30,24 +26,22 @@ const AppContent = () => {
       <Route
         path="/connections"
         element={
-          <Layout>
+          <Layout title="Manage Financial Institutions">
             <ConnectionsPage />
           </Layout>
         }
       />
       {/* Redirect any other unmatched paths to dashboard */}
-      <Route path="/*" element={<Navigate to="/" replace />} />
+      <Route path="/*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 };
 
 const App = () => {
   return (
-    // <AuthProvider>
       <NotificationProvider>
         <AppContent />
       </NotificationProvider>
-    // </AuthProvider>
   );
 };
 

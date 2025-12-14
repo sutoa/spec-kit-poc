@@ -15,7 +15,7 @@ class AccountCreate(AccountBase):
 
 
 class Account(AccountBase):
-    id: int
+    id: Optional[int] = None # Make ID optional, as it's assigned by DB
     institution_id: int
 
     class Config:
@@ -35,6 +35,7 @@ class InstitutionCreate(InstitutionBase):
 class Institution(InstitutionBase):
     id: int
     accounts: List[Account] = []
+    sub_total: float # Add sub_total to Institution schema
 
     class Config:
         orm_mode = True

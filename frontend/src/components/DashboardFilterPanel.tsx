@@ -1,49 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface DashboardFilterPanelProps {
-  asOfDate: string;
-  onDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onDateChange: (date: string) => void;
   onRefresh: () => void;
-  onApplyFilters: () => void;
-  hasConnections: boolean;
 }
 
-const DashboardFilterPanel: React.FC<DashboardFilterPanelProps> = ({
-  asOfDate,
-  onDateChange,
-  onRefresh,
-  onApplyFilters,
-  hasConnections,
-}) => {
+const DashboardFilterPanel: React.FC<DashboardFilterPanelProps> = ({ onDateChange, onRefresh }) => {
+  const [selectedDate, setSelectedDate] = useState<string>('');
+
+  const handleDateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDate(event.target.value);
+    onDateChange(event.target.value);
+  };
+
   return (
-    <div className="flex flex-col gap-4 h-full">
-      <h1 className="text-text-primary-light dark:text-text-primary-dark text-base font-medium leading-normal">Filters</h1>
-      <label className="flex flex-col w-full">
-        <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium pb-1.5">As of Date</p>
-        <div className="flex w-full flex-1 items-stretch rounded-lg">
-          <input
-            type="date"
-            value={asOfDate}
-            onChange={onDateChange}
-            className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark focus:border-primary h-10 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark p-2 text-sm font-normal leading-normal"
-          />
-        </div>
-      </label>
-      <button
-        onClick={onApplyFilters}
-        disabled={!hasConnections}
-        className="w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] mt-4 disabled:opacity-50 disabled:cursor-not-allowed">
-        <span className="truncate">Apply Filters</span>
-      </button>
+    <div className="p-4 border-r w-64">
+      <h2 className="text-lg font-bold mb-4">Filters</h2>
+      <div className="mb-4">
+        <label htmlFor="asOfDate" className="block text-sm font-medium text-gray-700">As of Date</label>
+        <input
+          type="date"
+          id="asOfDate"
+          name="asOfDate"
+          value={selectedDate}
+          onChange={handleDateInputChange}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        />
+      </div>
       <button
         onClick={onRefresh}
-        disabled={!hasConnections}
-        className="w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-search-bg-light dark:bg-search-bg-dark text-text-primary-light dark:text-text-primary-dark text-sm font-bold leading-normal tracking-[0.015em] disabled:opacity-50 disabled:cursor-not-allowed">
-        <span className="truncate">Refresh Data</span>
+        className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Refresh Data
       </button>
+      {/* Searchable list of institutions will go here later */}
     </div>
   );
 };
 
 export default DashboardFilterPanel;
-

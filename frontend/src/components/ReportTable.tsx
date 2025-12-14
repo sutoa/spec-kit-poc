@@ -1,68 +1,52 @@
 import React from 'react';
 
 interface Account {
-  snaptrade_account_id: string;
   masked_account_number: string;
   balance: number;
-  currency: string;
-  as_of_date: string;
+  as_of_date: string; // YYYY-MM-DD
 }
 
-interface Institution {
+interface InstitutionData {
   name: string;
   accounts: Account[];
+  sub_total: number;
 }
 
 interface ReportTableProps {
-  institutions: Institution[];
+  institutions: InstitutionData[];
+  grandTotal: number;
 }
 
-const ReportTable: React.FC<ReportTableProps> = ({ institutions }) => {
+const ReportTable: React.FC<ReportTableProps> = ({ institutions, grandTotal }) => {
   return (
-    <div className="flex flex-col gap-4">
-      {institutions.map((institution) => {
-        const subTotal = institution.accounts.reduce((acc, account) => acc + account.balance, 0);
-
-        return (
-          <div key={institution.name} className="bg-panel-light dark:bg-panel-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden">
-            <div className="p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50 dark:bg-white/5">
-              <h3 className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark tracking-tight">{institution.name}</h3>
-              <div className="text-right">
-                <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Sub-total</p>
-                <p className="font-bold text-lg text-text-primary-light dark:text-text-primary-dark">
-                  {subTotal.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD', // Assuming USD for sub-total for now
-                  })}
-                </p>
-              </div>
-            </div>
-            <div className="divide-y divide-border-light dark:divide-border-dark">
-              {institution.accounts.map((account) => (
-                <div key={account.snaptrade_account_id} className="grid grid-cols-3 gap-4 p-3 items-center">
-                  <div className="col-span-1">
-                    <p className="font-medium text-text-primary-light dark:text-text-primary-dark text-sm">{account.masked_account_number}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-base text-text-primary-light dark:text-text-primary-dark">
-                      {account.balance.toLocaleString('en-US', {
-                        style: 'currency',
-                        currency: account.currency,
-                      })}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">{new Date(account.as_of_date).toISOString().split('T')[0]}</p>
-                  </div>
-                </div>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Account Report</h2>
+      {institutions.map((institution) => (
+        <div key={institution.name} className="mb-6">
+          <h3 className="text-lg font-semibold">{institution.name} (Subtotal: ${institution.sub_total.toFixed(2)})</h3>
+          <table className="min-w-full bg-white border border-gray-200">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 border-b">Account Number</th>
+                <th className="py-2 px-4 border-b">Balance</th>
+                <th className="py-2 px-4 border-b">As of Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {institution.accounts.map((account, index) => (
+                <tr key={index}>
+                  <td className="py-2 px-4 border-b">{account.masked_account_number}</td>
+                  <td className="py-2 px-4 border-b">${account.balance.toFixed(2)}</td>
+                  <td className="py-2 px-4 border-b">{account.as_of_date}</td>
+                </tr>
               ))}
-            </div>
-          </div>
-        );
-      })}
+            </tbody>
+          </table>
+        </div>
+      ))}
+      <h2 className="text-xl font-bold mt-6">Grand Total: ${grandTotal.toFixed(2)}</h2>
     </div>
   );
 };
 
 export default ReportTable;
-

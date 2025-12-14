@@ -41,34 +41,34 @@ This phase focuses on implementing the ability for users to connect their financ
 - [X] T015 [US2] Create `ConnectionCard.tsx` component in `frontend/src/components/ConnectionCard.tsx` to display institution details and status
 - [X] T016 [P] [US2] Implement frontend logic in `ConnectionsPage.tsx` to fetch and display connections from the API
 - [X] T017 [P] [US2] Implement frontend logic to call /snaptrade/connect and use the SnapTrade React SDK to handle the connection flow
-- [ ] T018 [US2] Write backend tests for Connection endpoints in `backend/tests/test_connections.py`
+- [X] T018 [US2] Write backend tests for Connection endpoints in `backend/tests/test_connections.py`
 
 ## Phase 3: [US1] Dashboard View
 
 This phase implements the primary feature: the consolidated account dashboard.
 
-- [ ] T019 [US1] Implement `/dashboard` GET endpoint in `backend/app/main.py` to fetch, aggregate, and return account data for all connected institutions
-- [ ] T020 [US1] Implement caching logic in the `/dashboard` endpoint in `backend/app/cache.py`
-- [ ] T021 [US1] Add support for the `as_of_date` filter in the `/dashboard` endpoint
-- [ ] T022 [US1] Create `DashboardPage.tsx` component in `frontend/src/pages/DashboardPage.tsx`
-- [ ] T023 [US1] Create `DashboardFilterPanel.tsx` component in `frontend/src/components/DashboardFilterPanel.tsx`
-- [ ] T024 [P] [US1] Create `ReportTable.tsx` component in `frontend/src/components/ReportTable.tsx` to display accounts grouped by institution
-- [ ] T025 [P] [US1] Create `StatCard.tsx` component in `frontend/src/components/StatCard.tsx` for "Grand Total" and other metrics
-- [ ] T026 [US1] Implement frontend logic in `DashboardPage.tsx` to fetch and display dashboard data
-- [ ] T027 [US1] Implement frontend logic for the "as-of-date" filter and "Refresh" button in `DashboardPage.tsx`
-- [ ] T028 [US1] Display an empty state or skeleton loader in `DashboardPage.tsx` while data is loading
-- [ ] T029 [US1] Write backend tests for the Dashboard endpoint in `backend/tests/test_dashboard.py`
+- [X] T019 [US1] Implement /dashboard GET endpoint in `backend/app/main.py` to fetch, aggregate, and return account data for all connected institutions
+- [X] T020 [US1] Implement caching logic in the `/dashboard` endpoint in `backend/app/cache.py`
+- [X] T021 [US1] Add support for the `as_of_date` filter in the /dashboard endpoint
+- [X] T022 [US1] Create `DashboardPage.tsx` component in `frontend/src/pages/DashboardPage.tsx`
+- [X] T023 [US1] Create `DashboardFilterPanel.tsx` component in `frontend/src/components/DashboardFilterPanel.tsx`
+- [X] T024 [P] [US1] Create `ReportTable.tsx` component in `frontend/src/components/ReportTable.tsx` to display accounts grouped by institution
+- [X] T025 [P] [US1] Create `StatCard.tsx` component in `frontend/src/components/StatCard.tsx` for "Grand Total" and other metrics
+- [X] T026 [US1] Implement frontend logic in `DashboardPage.tsx` to fetch and display dashboard data
+- [X] T027 [US1] Implement frontend logic for the "as-of-date" filter and "Refresh" button in `DashboardPage.tsx`
+- [X] T028 [US1] Display an empty state or skeleton loader in `DashboardPage.tsx` while data is loading
+- [X] T029 [US1] Write backend tests for the Dashboard endpoint in `backend/tests/test_dashboard.py`
 
 ## Phase 4: Polish & Cross-Cutting Concerns
 
 This final phase addresses UI/UX polish, error handling, and other non-functional requirements.
 
-- [ ] T030 [P] Create shared `Layout.tsx`, `SideNav.tsx`, and `Header.tsx` components in `frontend/src/components/` to match mockups
-- [ ] T031 [P] Implement global notification system for API errors or success messages (e.g., "Connection successful") in `frontend/src/context/NotificationContext.tsx`
-- [ ] T032 Implement logging middleware in `backend/app/logging_config.py`
-- [ ] T033 Review and ensure all UI components are a "pixel-perfect" match to the mockups in `specs/002-account-reporting-utility/screens/`
-- [ ] T034 Write `README.md` files for both `frontend/` and `backend/` with setup and run instructions
-- [ ] T035 Final validation of all acceptance criteria from `spec.md`
+- [X] T030 [P] Create shared `Layout.tsx`, `SideNav.tsx`, and `Header.tsx` components in `frontend/src/components/` to match mockups
+- [X] T031 [P] Implement global notification system for API errors or success messages (e.g., "Connection successful") in `frontend/src/context/NotificationContext.tsx`
+- [X] T032 Implement logging middleware in `backend/app/logging_config.py`
+- [X] T033 Review and ensure all UI components are a "pixel-perfect" match to the mockups in `specs/002-account-reporting-utility/screens/`
+- [X] T034 Write `README.md` files for both `frontend/` and `backend/` with setup and run instructions
+- [X] T035 Final validation of all acceptance criteria from `spec.md`
 
 ## Parallel Execution Examples
 

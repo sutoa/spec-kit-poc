@@ -11,3 +11,9 @@ export const connectInstitution = async (institutionId: string) => {
   const response = await axios.post(`${API_URL}/snaptrade/connect`, { institution_id: institutionId });
   return response.data;
 };
+
+export const getDashboardData = async (asOfDate?: string) => {
+  const params = asOfDate ? { as_of_date: asOfDate } : {};
+  const response = await axios.get(`${API_URL}/dashboard/`, { params });
+  return response.data;
+};

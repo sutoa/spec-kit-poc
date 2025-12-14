@@ -1,41 +1,25 @@
-# Frontend - React Application
+# Account Reporting Utility - Frontend
 
-This directory contains the React frontend application for the Account Reporting Utility.
+This document provides instructions on how to set up and run the frontend of the Account Reporting Utility.
 
-## Setup
+## Prerequisites
 
-1.  **Install dependencies:**
+-   Node.js and npm
+
+## Setup and Run
+
+1.  **Navigate to the frontend directory:**
+    ```bash
+    cd frontend
+    ```
+
+2.  **Install the dependencies:**
     ```bash
     npm install
     ```
 
-## Running the Application
-
-To start the development server:
-
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5173` by default (check the output of the command for the exact URL).
-
-## Project Structure
-
--   `src/main.tsx`: The entry point of the application.
--   `src/App.tsx`: The main application component, which sets up routing.
--   `src/pages/`: Page components for different routes (e.g., `DashboardPage`, `ConnectionsPage`, `LoginPage`).
--   `src/components/`: Reusable components used across different pages.
--   `src/services/api.ts`: An Axios instance configured for making API requests to the backend.
--   `src/context/`: React context providers for managing global state (e.g., `AuthContext`, `NotificationContext`).
--   `tailwind.config.js`: Configuration for the Tailwind CSS framework.
--   `vite.config.ts`: Configuration for the Vite build tool.
-
-## Building for Production
-
-To create a production build of the application:
-
-```bash
-npm run build
-```
-
-The output will be in the `dist/` directory.
+3.  **Run the application:**
+    ```bash
+    npm run dev
+    ```
+    The frontend will be running at `http://localhost:5173` (or another port if 5173 is in use).
