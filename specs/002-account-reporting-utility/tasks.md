@@ -1,94 +1,81 @@
 # Tasks: Account Reporting Utility
 
-This file breaks down the implementation of the Account Reporting Utility into actionable, dependency-ordered tasks.
+This file outlines the implementation tasks for the Account Reporting Utility feature, focusing on the frontend. The tasks are generated based on the feature specification and are organized into phases for incremental development.
 
 ## Implementation Strategy
 
-The implementation will follow a phased approach, prioritizing foundational components and then building features based on user story priority. The MVP is defined as the completion of **User Story 2 (Connection Management)** and **User Story 1 (Dashboard View)**. Each user story is designed to be an independently testable increment.
+The implementation will follow a phased approach, starting with foundational components and then implementing user stories incrementally. Each user story phase is designed to be independently testable. The primary goal is to achieve a pixel-perfect implementation of the provided UI mockups.
+
+**MVP Scope**: The Minimum Viable Product will consist of User Story 1 (Dashboard) and User Story 2 (Connections), as they are codependent.
 
 ## Dependencies
 
-The completion of user stories must follow this order:
+The user stories are sequential. The successful completion of the Connections page (US2) is a prerequisite for the Dashboard (US1) to display any meaningful data.
 
-1.  **[US2] Connection Management**: Must be completed first, as the dashboard requires connected institutions to display any data.
-2.  **[US1] Dashboard View**: Depends on the ability to create connections and fetch account data.
+-   **US1 (Dashboard)** depends on **US2 (Connections)**
 
 ---
 
-## Phase 1: Project Setup
+## Phase 1: Setup & Configuration
 
-These tasks focus on initializing the project structure, installing dependencies, and creating the basic scaffolding for both the frontend and backend.
+This phase focuses on setting up the frontend environment and installing necessary dependencies.
 
-- [X] T001 Create backend project structure and virtual environment in `backend/`
-- [X] T002 Create `backend/requirements.txt` with initial dependencies: `fastapi`, `uvicorn[standard]`, `pydantic`, `sqlalchemy`, `python-dotenv`
-- [X] T003 Run `pip install -r backend/requirements.txt`
-- [X] T004 Initialize frontend React+TypeScript project using Vite in `frontend/`
-- [X] T005 Run `npm install` in `frontend/` and add dev dependencies: `tailwindcss`, `postcss`, `autoprefixer`
-- [X] T006 Configure Tailwind CSS in `frontend/tailwind.config.js` and `frontend/postcss.config.js`
-- [X] T007 Create initial database schema and connection logic in `backend/app/database.py`
-- [X] T008 Install frontend testing dependencies (`vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`) in `frontend/`
+-   [ ] T001 Install additional frontend dependencies: `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `date-fns`, and `react-day-picker`.
+-   [ ] T002 Configure Tailwind CSS with the color palette and fonts specified in the mockup `code.html` files (`specs/002-account-reporting-utility/screens/dashboard_tab/code.html`).
 
-## Phase 2: [US2] Connection Management
+---
 
-This phase focuses on implementing the ability for users to connect their financial institution accounts.
+## Phase 2: Foundational UI Components
 
-- [X] T009 [US2] Implement Institution and Account models in `backend/app/models.py`
-- [X] T010 [US2] Implement Institution and Account schemas in `backend/app/schemas.py`
-- [X] T011 [US2] Implement CRUD operations for Institutions and Accounts in `backend/app/crud.py`
-- [X] T012 [US2] Implement /institutions GET endpoint in `backend/app/main.py` to list all institutions
-- [X] T013 [US2] Implement /snaptrade/connect POST endpoint in `backend/app/main.py` to initiate SnapTrade connection and return the `redirect_uri`
-- [X] T014 [US2] Implement /snaptrade/callback POST endpoint in `backend/app/main.py` to handle SnapTrade's success callback
-- [X] T015 [US2] Create `ConnectionsPage.tsx` component in `frontend/src/pages/ConnectionsPage.tsx`
-- [X] T016 [US2] Create `ConnectionCard.tsx` component in `frontend/src/components/ConnectionCard.tsx` to display institution details and status
-- [X] T017 [P] [US2] Implement frontend logic in `ConnectionsPage.tsx` to fetch and display connections from the API
-- [X] T018 [P] [US2] Implement frontend logic to call /snaptrade/connect and use the SnapTrade React SDK to handle the connection flow
-- [X] T019 [US2] Write backend tests for Connection endpoints in `backend/tests/test_connections.py`
+This phase involves creating the core, reusable UI components that form the application's layout and are shared across different pages.
 
-## Phase 3: [US1] Dashboard View
+-   [ ] T003 [P] Implement the main application layout with a collapsible left-side navigation panel and a main content area in `frontend/src/components/SideNav.tsx`. This component should match the navigation section of the mockup: `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png`.
+-   [ ] T004 [P] Implement the header component in `frontend/src/components/Header.tsx`. It should conditionally display titles and action buttons as seen in both mockups: `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png` and `specs/002-account-reporting-utility/screens/connection_tab/screen.png`.
+-   [ ] T005 [P] Implement a generic `StatCard` component in `frontend/src/components/StatCard.tsx` for displaying key metrics like "Grand Total". See the top of the dashboard mockup: `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png`.
+-   [ ] T006 [P] Create a `NotificationProvider` and context in `frontend/src/context/NotificationContext.tsx` to handle application-wide notifications.
+-   [ ] T007 Implement basic routing structure in `frontend/src/App.tsx` to handle navigation between the Dashboard and Connections pages.
 
-This phase implements the primary feature: the consolidated account dashboard.
+---
 
-- [X] T020 [US1] Implement /dashboard GET endpoint in `backend/app/main.py` to fetch, aggregate, and return account data for all connected institutions
-- [X] T021 [US1] Implement caching logic in the `/dashboard` endpoint in `backend/app/cache.py`
-- [X] T022 [US1] Add support for the `as_of_date` filter in the /dashboard endpoint
-- [X] T023 [US1] Create `DashboardPage.tsx` component in `frontend/src/pages/DashboardPage.tsx`
-- [X] T024 [US1] Create `DashboardFilterPanel.tsx` component in `frontend/src/components/DashboardFilterPanel.tsx`
-- [X] T025 [P] [US1] Create `ReportTable.tsx` component in `frontend/src/components/ReportTable.tsx` to display accounts grouped by institution
-- [X] T026 [P] [US1] Create `StatCard.tsx` component in `frontend/src/components/StatCard.tsx` for "Grand Total" and other metrics
-- [X] T027 [US1] Implement frontend logic in `DashboardPage.tsx` to fetch and display dashboard data
-- [X] T028 [US1] Implement frontend logic for the "as-of-date" filter and "Refresh" button in `DashboardPage.tsx`
-- [X] T029 [US1] Display an empty state or skeleton loader in `DashboardPage.tsx` while data is loading
-- [X] T030 [US1] Write backend tests for the Dashboard endpoint in `backend/tests/test_dashboard.py`
+## Phase 3: User Story 2 - Manage Connections (US2)
 
-## Phase 4: Polish & Cross-Cutting Concerns
+**Goal**: Allow users to view and manage connections to financial institutions.
+**Reference**: `specs/002-account-reporting-utility/screens/connection_tab/screen.png`
 
-This final phase addresses UI/UX polish, error handling, and other non-functional requirements.
+-   [ ] T008 [US2] Create the `ConnectionsPage` component in `frontend/src/pages/ConnectionsPage.tsx` based on `specs/002-account-reporting-utility/screens/connection_tab/screen.png`.
+-   [ ] T009 [US2] Implement the main title, subtitle, "Add New Connection" button, and search bar for the Connections page within `frontend/src/pages/ConnectionsPage.tsx`, matching `specs/002-account-reporting-utility/screens/connection_tab/screen.png`.
+-   [ ] T010 [US2] Create the `ConnectionCard` component in `frontend/src/components/ConnectionCard.tsx`. This card must be a pixel-perfect match of the institution cards in `specs/002-account-reporting-utility/screens/connection_tab/screen.png`, displaying the logo, name, status dot, status text, and a "more_vert" menu.
+-   [ ] T011 [US2] Implement the API service call in `frontend/src/services/api.ts` to fetch the list of financial institutions from the backend.
+-   [ ] T012 [US2] In `frontend/src/pages/ConnectionsPage.tsx`, fetch the list of institutions and render them in a grid of `ConnectionCard` components. The list must be sorted alphabetically, with connected institutions appearing first.
+-   [ ] T013 [US2] Implement the real-time search functionality in `frontend/src/pages/ConnectionsPage.tsx` that filters the displayed institutions based on user input in the search bar.
+-   [ ] T014 [US2] Implement the connection flow initiation. Clicking "Connect" from the `ConnectionCard`'s menu should trigger the SnapTrade React SDK's connection flow. This will likely be handled within `frontend/src/pages/ConnectionsPage.tsx` or a dedicated hook.
+-   [ ] T015 [US2] Add a unit test for the `ConnectionCard` component in `frontend/src/components/ConnectionCard.test.tsx` to verify it renders all props correctly.
+-   [ ] T016 [US2] Add an integration test for the `ConnectionsPage` in `frontend/src/pages/ConnectionsPage.test.tsx` to verify that it correctly fetches and displays a list of institutions, and that its visual presentation matches `specs/002-account-reporting-utility/screens/connection_tab/screen.png`.
 
-- [X] T031 [P] Create shared `Layout.tsx`, `SideNav.tsx`, and `Header.tsx` components in `frontend/src/components/` to match mockups
-- [X] T032 [P] Implement global notification system for API errors or success messages (e.g., "Connection successful") in `frontend/src/context/NotificationContext.tsx`
-- [X] T033 Implement logging middleware in `backend/app/logging_config.py`
-- [X] T034 Review and ensure all UI components are a "pixel-perfect" match to the mockups in `specs/002-account-reporting-utility/screens/`
-- [X] T035 Write `README.md` files for both `frontend/` and `backend/` with setup and run instructions
-- [X] T036 Final validation of all acceptance criteria from `spec.md`
+---
 
-## Phase 5: Frontend Testing
+## Phase 4: User Story 1 - View Dashboard (US1)
 
-This phase focuses on implementing comprehensive frontend tests to ensure the quality and correctness of the UI components and services.
+**Goal**: Allow users to view a consolidated report of their financial accounts.
+**Reference**: `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png`
 
-- [X] T037 [US2] Write unit tests for `ConnectionsPage.tsx` (`frontend/src/pages/ConnectionsPage.tsx`)
-- [X] T038 [US2] Write unit tests for `ConnectionCard.tsx` (`frontend/src/components/ConnectionCard.tsx`)
-- [X] T039 [US2] Write unit tests for connection-related functions in `frontend/src/services/api.ts`
-- [X] T040 [US1] Write unit tests for `DashboardPage.tsx` (`frontend/src/pages/DashboardPage.tsx`)
-- [X] T041 [US1] Write unit tests for `DashboardFilterPanel.tsx` (`frontend/src/components/DashboardFilterPanel.tsx`)
-- [X] T042 [US1] Write unit tests for `ReportTable.tsx` (`frontend/src/components/ReportTable.tsx`)
-- [X] T043 [US1] Write unit tests for `StatCard.tsx` (`frontend/src/components/StatCard.tsx`)
-- [X] T044 [US1] Write unit tests for dashboard-related functions in `frontend/src/services/api.ts`
-- [X] T045 Write unit tests for `Layout.tsx`, `SideNav.tsx`, and `Header.tsx` (`frontend/src/components/`)
-- [X] T046 Write unit tests for `Notification.tsx` and `NotificationContext.tsx` (`frontend/src/components/` and `frontend/src/context/`)
+-   [ ] T017 [US1] Create the `DashboardPage` component in `frontend/src/pages/DashboardPage.tsx` based on `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png`.
+-   [ ] T018 [US1] Implement the `DashboardFilterPanel` component in `frontend/src/components/DashboardFilterPanel.tsx`. This panel must contain the "As of Date" picker and a disabled placeholder for the institution checklist, matching `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png`.
+-   [ ] T019 [US1] Implement the `ReportTable` component in `frontend/src/components/ReportTable.tsx`. This component will display the accounts grouped by institution, with sub-totals and a grand total, as detailed in `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png`.
+-   [ ] T020 [US1] Implement the API service call in `frontend/src/services/api.ts` to fetch the consolidated account report data from the backend, including filtering by "as-of date".
+-   [ ] T021 [US1] In `frontend/src/pages/DashboardPage.tsx`, integrate the `DashboardFilterPanel` and `ReportTable`. Implement the logic to fetch and display the report data when the "Refresh Data" button is clicked.
+-   [ ] T022 [US1] Implement the empty state for the dashboard. If no institutions are connected, the page should display a message prompting the user to go to the Connections page, and the "Refresh Data" button in the `Header` should be disabled.
+-   [ ] T023 [US1] Implement the skeleton loader. While report data is being fetched, the UI must display a skeleton loader that mimics the `ReportTable` layout. This should be implemented in `frontend/src/components/SkeletonLoader.tsx` and used in `frontend/src/pages/DashboardPage.tsx`.
+-   [ ] T024 [US1] Add a unit test for the `ReportTable` component in `frontend/src/components/ReportTable.test.tsx` to verify it correctly calculates and displays totals.
+-   [ ] T025 [US1] Add an integration test for the `DashboardPage` in `frontend/src/pages/DashboardPage.test.tsx` to simulate filtering and refreshing the report, and to visually confirm it matches `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png`.
 
-## Parallel Execution Examples
+---
 
--   **Phase 2**: `T016` (Frontend Fetching) and `T017` (Frontend Connection Flow) can be worked on in parallel after the backend endpoints are defined.
--   **Phase 3**: `T025` (ReportTable component) and `T026` (StatCard component) can be developed in parallel.
--   **Phase 4**: `T031` (Layout components) and `T032` (Notification system) can be implemented in parallel.
--   **Phase 5**: `T037`, `T038`, `T039`, `T040`, `T041`, `T042`, `T043`, `T044`, `T045`, `T046` can be worked on in parallel within their respective user stories, and across stories if independent.
+## Phase 5: Polish & Cross-Cutting Concerns
+
+This phase addresses final touches and system-wide concerns.
+
+-   [ ] T026 Ensure all UI components are fully responsive for desktop screen sizes.
+-   [ ] T027 [P] Review and add input sanitization to all user input fields to prevent XSS vulnerabilities.
+-   [ ] T028 [P] Perform a final review of the entire frontend application against the mockups `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png` and `specs/002-account-reporting-utility/screens/connection_tab/screen.png` to ensure pixel-perfect implementation.
+-   [ ] T029 Write end-to-end tests covering the flow from connecting an institution to viewing its data on the dashboard.
