@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { getInstitutions } from '../services/api';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { getInstitutions, connectInstitution } from '../services/api';
 import ConnectionCard from '../components/ConnectionCard';
+import { Institution } from '../types/connection';
 
 const ConnectionsPage: React.FC = () => {
-  const [institutions, setInstitutions] = useState([]);
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,22 +28,34 @@ const ConnectionsPage: React.FC = () => {
     fetchInstitutions();
   }, []);
 
+  const handleConnect = async (institutionId: number) => { // Changed type to number
+    try {
+      const data = await connectInstitution(institutionId);
+      if (data.redirect_uri) {
+        window.location.href = data.redirect_uri;
+      }
+    } catch (err: any) {
+      setError(err.message || "Error connecting to institution");
+      console.error('Error connecting to institution:', err);
+    }
+  };
+
   const filteredInstitutions = institutions.filter(inst =>
     inst.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <div>Loading connections...</div>;
-  if (error) return <div className="text-red-500">Error: {error}</div>;
-
   return (
     <div className="p-8">
-      <div className="mx-auto max-w-5xl"> {/* Added for consistent page width based on mockup */}
+      <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-col gap-2">
             <p className="text-4xl font-black leading-tight tracking-[-0.033em] text-slate-900 dark:text-white">Manage Financial Institutions</p>
             <p className="text-base font-normal text-slate-500 dark:text-slate-400">Connect your accounts to consolidate all your financial data in one place.</p>
           </div>
-          <button className="flex h-10 min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-5 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary/90">
+          <button 
+            onClick={() => handleConnect(1)} // Changed to pass a number
+            className="flex h-10 min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-5 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary/90"
+          >
             <span className="material-symbols-outlined text-lg">add</span>
             <span className="truncate">Add New Connection</span>
           </button>
@@ -60,11 +74,15 @@ const ConnectionsPage: React.FC = () => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-6 @lg:grid-cols-2 @4xl:grid-cols-3">
-          {filteredInstitutions.map((inst) => (
-            <ConnectionCard key={inst.id} institution={inst} />
-          ))}
-        </div>
+        {loading && <div>Loading connections...</div>}
+        {error && <div className="text-red-500">Error: {error}</div>}
+        {!loading && !error && (
+          <div className="grid grid-cols-1 gap-6 @lg:grid-cols-2 @4xl:grid-cols-3">
+            {filteredInstitutions.map((inst) => (
+              <ConnectionCard key={inst.id} institution={inst} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

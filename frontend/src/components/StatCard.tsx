@@ -1,12 +1,12 @@
-import React from 'react';
+import * as React from 'react';
 
 interface StatCardProps {
   title: string;
   value: string | number;
-  valueClassName?: string; // Optional class for value for different sizes
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, valueClassName = "text-3xl" }) => {
+const StatCard: React.FC<StatCardProps> = ({ title, value }) => {
+  const valueClassName = title === "Grand Total" ? "text-5xl" : "text-4xl";
   return (
     <div className="bg-panel-light dark:bg-panel-dark p-6 rounded-xl border border-border-light dark:border-border-dark flex-1">
       <p className="text-base font-medium text-text-secondary-light dark:text-text-secondary-dark mb-2">{title}</p>

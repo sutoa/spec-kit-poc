@@ -1,9 +1,9 @@
-import React from 'react';
+import * as React from 'react';
 
 interface Account {
   masked_account_number: string;
   balance: number;
-  as_of_date: string; // YYYY-MM-DD
+  as_of_date: string;
 }
 
 interface InstitutionData {
@@ -17,11 +17,11 @@ interface ReportTableProps {
   grandTotal: number;
 }
 
-const ReportTable: React.FC<ReportTableProps> = ({ institutions, grandTotal }) => {
+const ReportTable: React.FC<ReportTableProps> = ({ institutions }) => {
   return (
     <div className="flex flex-col gap-4">
-      {institutions.map((institution) => (
-        <div key={institution.name} className="bg-panel-light dark:bg-panel-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden">
+      {institutions.map((institution, instIndex) => (
+        <div key={instIndex} className="bg-panel-light dark:bg-panel-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden">
           <div className="p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50 dark:bg-white/5">
             <h3 className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark tracking-tight">{institution.name}</h3>
             <div className="text-right">
@@ -30,16 +30,15 @@ const ReportTable: React.FC<ReportTableProps> = ({ institutions, grandTotal }) =
             </div>
           </div>
           <div className="divide-y divide-border-light dark:divide-border-dark">
-            {institution.accounts.map((account, index) => (
-              <div key={index} className="grid grid-cols-4 gap-4 p-3 items-center">
+            {institution.accounts.map((account, accIndex) => (
+              <div key={accIndex} className="grid grid-cols-4 gap-4 p-3 items-center">
                 <div className="col-span-2">
-                  {/* Mock account type for now */}
-                  <p className="font-medium text-text-primary-light dark:text-text-primary-dark text-sm">Brokerage Account</p> 
-                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark font-mono">{account.masked_account_number}</p>
+                  <p className="font-medium text-text-primary-light dark:text-text-primary-dark text-sm">Account</p>
+                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark font-mono">•••• {account.masked_account_number}</p>
                 </div>
-                <div className="text-right col-span-2"> {/* Changed to col-span-2 to match mockup layout */}
+                <div className="text-right col-span-2">
                   <p className="font-medium text-base text-text-primary-light dark:text-text-primary-dark">${account.balance.toFixed(2)}</p>
-                  <p className="text-[10px] text-text-secondary-light dark:text-text-secondary-dark">as of {account.as_of_date}</p>
+                  <p className="text-[10px] text-text-secondary-light dark:text-text-secondary-dark">as of {new Date(account.as_of_date).toLocaleDateString()}</p>
                 </div>
               </div>
             ))}

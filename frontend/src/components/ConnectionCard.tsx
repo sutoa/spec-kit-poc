@@ -1,19 +1,11 @@
-import React from 'react';
-import { connectInstitution } from '../services/api';
+import * as React from 'react';
+import { Institution } from '../types/connection';
 
 interface ConnectionCardProps {
-  institution: {
-    id: string;
-    external_id: string; // Add external_id for image lookup
-    name: string;
-    status: string;
-  };
+  institution: Institution;
 }
 
 const ConnectionCard: React.FC<ConnectionCardProps> = ({ institution }) => {
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-
   const getStatusClasses = (status: string) => {
     switch (status) {
       case 'connected':
@@ -29,9 +21,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ institution }) => {
     }
   };
 
-  // Mock image based on institution name for now
   const getInstitutionImage = (name: string) => {
-    // This should ideally come from the backend or a predefined list
     if (name.toLowerCase().includes('alpaca')) {
       return 'https://lh3.googleusercontent.com/aida-public/AB6AXuBHvR_5CJ7bIDbaFBwIltiPtoCYEq0-FvGvqHlKtR3JiYfd43iuOAzi5cS-yDuIqr4BAfc-r_j-VucUSYDay7GiKR3nhJwgxhot_KdNTkMV6JmSDP1TxI04banUaNrvq_erKQxe_5IFDY3bbiwIMLzN-1Ez_X4Neaz7BMOdfhSAoIkUmDtzT1t6DbZx2iBUv9Qms5uTtaiJuTqXFLOkT0TGM_BDUUs7C-mwqor8wu_WqF6Sa-SMkEB3MziLNcBP2yCffO5ZD39OSCst';
     } else if (name.toLowerCase().includes('vanguard')) {
@@ -42,22 +32,6 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ institution }) => {
     return 'https://via.placeholder.com/40'; // Default image
   };
 
-  const handleConnect = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await connectInstitution(institution.id); // Assuming institution.id is used for connect
-      if (data.redirect_uri) {
-        window.location.href = data.redirect_uri;
-      }
-    } catch (err: any) {
-      setError(err.message || "Error connecting to institution");
-      console.error('Error connecting to institution:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const statusClasses = getStatusClasses(institution.status);
   const institutionImage = getInstitutionImage(institution.name);
 
@@ -65,7 +39,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ institution }) => {
     <div className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <img className="size-10 rounded-full" data-alt={`${institution.name} logo`} src={institutionImage} />
+          <img className="size-10 rounded-full" alt={`${institution.name} logo`} src={institutionImage} />
           <span className="font-semibold text-slate-800 dark:text-white">{institution.name}</span>
         </div>
         <button className="flex h-8 w-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800">
@@ -74,24 +48,13 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({ institution }) => {
       </div>
       <div className="mt-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className={`size-2 rounded-full ${statusClasses.split(' ')[0]}`}></div> {/* Get background color class */}
+          <div className={`size-2 rounded-full ${statusClasses.split(' ')[0]}`}></div>
           <span className={`text-sm ${statusClasses.split(' ')[1]}`}>
             {institution.status.charAt(0).toUpperCase() + institution.status.slice(1)}
           </span>
         </div>
-        {/* Updated time is not dynamic, so hardcoding for now as per mockup */}
-        <span className="text-sm text-slate-400 dark:text-slate-500">Updated Xm ago</span>
+        <span className="text-sm text-slate-400 dark:text-slate-500">Updated 2m ago</span>
       </div>
-      {institution.status !== 'connected' && (
-        <button
-          onClick={handleConnect}
-          disabled={loading}
-          className="mt-4 w-full bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all"
-        >
-          {loading ? 'Connecting...' : 'Connect'}
-        </button>
-      )}
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </div>
   );
 };

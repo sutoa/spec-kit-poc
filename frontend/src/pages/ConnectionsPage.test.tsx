@@ -1,9 +1,8 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import ConnectionsPage from './ConnectionsPage';
 import { getInstitutions } from '../services/api';
-import { vi } from 'vitest';
+import { vi, Mock as ViMock } from 'vitest';
 
 vi.mock('../services/api', () => ({
   getInstitutions: vi.fn(),
@@ -11,7 +10,7 @@ vi.mock('../services/api', () => ({
 
 describe('ConnectionsPage', () => {
   it('renders "Manage Financial Institutions" heading', async () => {
-    (getInstitutions as Mock).mockResolvedValueOnce([]);
+    (getInstitutions as ViMock).mockResolvedValueOnce([]);
     render(
       <BrowserRouter>
         <ConnectionsPage />
@@ -22,10 +21,10 @@ describe('ConnectionsPage', () => {
 
   it('displays institutions fetched from the API', async () => {
     const mockInstitutions = [
-      { id: '1', external_id: 'inst1', name: 'Bank A', status: 'connected' },
-      { id: '2', external_id: 'inst2', name: 'Bank B', status: 'disconnected' },
+      { id: 1, external_id: 'inst1', name: 'Bank A', status: 'connected' }, // id changed to number
+      { id: 2, external_id: 'inst2', name: 'Bank B', status: 'disconnected' }, // id changed to number
     ];
-    (getInstitutions as Mock).mockResolvedValueOnce(mockInstitutions);
+    (getInstitutions as ViMock).mockResolvedValueOnce(mockInstitutions);
 
     render(
       <BrowserRouter>
@@ -34,8 +33,8 @@ describe('ConnectionsPage', () => {
     );
 
     expect(await screen.findByText('Bank A')).toBeInTheDocument();
-    expect(screen.getByText('Status: connected')).toBeInTheDocument();
+    expect(screen.getByText('Connected')).toBeInTheDocument(); // Updated for casing
     expect(screen.getByText('Bank B')).toBeInTheDocument();
-    expect(screen.getByText('Status: disconnected')).toBeInTheDocument();
+    expect(screen.getByText('Disconnected')).toBeInTheDocument(); // Updated for casing
   });
 });

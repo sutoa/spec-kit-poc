@@ -1,54 +1,49 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ReportTable from './ReportTable';
-import { vi } from 'vitest';
 
 describe('ReportTable', () => {
   const mockInstitutions = [
     {
-      name: 'Bank A',
+      name: 'Alpaca',
       accounts: [
-        { masked_account_number: '****1234', balance: 1000.00, as_of_date: '2023-01-01' },
-        { masked_account_number: '****5678', balance: 2000.00, as_of_date: '2023-01-01' },
+        { masked_account_number: '5678', balance: 730123.45, as_of_date: '2023-12-12' },
+        { masked_account_number: '1106', balance: 120110.66, as_of_date: '2023-12-12' },
       ],
-      sub_total: 3000.00,
+      sub_total: 850234.11,
     },
     {
-      name: 'Bank B',
+      name: 'Vanguard',
       accounts: [
-        { masked_account_number: '****9012', balance: 1500.00, as_of_date: '2023-01-01' },
+        { masked_account_number: '1122', balance: 25416.64, as_of_date: '2023-12-11' },
+        { masked_account_number: '3344', balance: 384100.01, as_of_date: '2023-12-12' },
       ],
-      sub_total: 1500.00,
+      sub_total: 409516.65,
     },
   ];
-  const mockGrandTotal = 4500.00;
-
-  it('renders "Account Report" heading', () => {
-    render(<ReportTable institutions={[]} grandTotal={0} />);
-    expect(screen.getByRole('heading', { name: /account report/i })).toBeInTheDocument();
-  });
 
   it('renders institution names, subtotals, and account details', () => {
-    render(<ReportTable institutions={mockInstitutions} grandTotal={mockGrandTotal} />);
+    render(<ReportTable institutions={mockInstitutions} grandTotal={0} />); // grandTotal is not used in rendering anymore
 
-    expect(screen.getByText('Bank A (Subtotal: $3000.00)')).toBeInTheDocument();
-    expect(screen.getByText('****1234')).toBeInTheDocument();
-    expect(screen.getByText('$1000.00')).toBeInTheDocument();
-    expect(screen.getByText('2023-01-01')).toBeInTheDocument();
+    // Check for Alpaca
+    expect(screen.getByRole('heading', { name: /alpaca/i })).toBeInTheDocument();
+    expect(screen.getByText(/\$850,234\.11/i)).toBeInTheDocument();
+    expect(screen.getByText(/•••• 5678/i)).toBeInTheDocument();
+    expect(screen.getByText(/\$730,123\.45/i)).toBeInTheDocument();
+    expect(screen.getByText(/as of 12\/12\/2023/i)).toBeInTheDocument();
 
-    expect(screen.getByText('Bank B (Subtotal: $1500.00)')).toBeInTheDocument();
-    expect(screen.getByText('****9012')).toBeInTheDocument();
-    expect(screen.getByText('$1500.00')).toBeInTheDocument();
+    // Check for Vanguard
+    expect(screen.getByRole('heading', { name: /vanguard/i })).toBeInTheDocument();
+    expect(screen.getByText(/\$409,516\.65/i)).toBeInTheDocument();
+    expect(screen.getByText(/•••• 1122/i)).toBeInTheDocument();
+    expect(screen.getByText(/\$25,416\.64/i)).toBeInTheDocument();
+    expect(screen.getByText(/as of 12\/11\/2023/i)).toBeInTheDocument();
+    expect(screen.getByText(/•••• 3344/i)).toBeInTheDocument();
+    expect(screen.getByText(/\$384,100\.01/i)).toBeInTheDocument();
   });
 
-  it('renders the grand total', () => {
-    render(<ReportTable institutions={mockInstitutions} grandTotal={mockGrandTotal} />);
-    expect(screen.getByRole('heading', { name: /grand total: \$4500.00/i })).toBeInTheDocument();
-  });
-
-  it('renders no institutions message if institutions array is empty', () => {
+  it('renders no institution data when institutions array is empty', () => {
     render(<ReportTable institutions={[]} grandTotal={0} />);
-    expect(screen.queryByText(/bank a/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/grand total: \$0.00/i)).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /alpaca/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /vanguard/i })).not.toBeInTheDocument();
   });
 });

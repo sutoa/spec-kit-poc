@@ -1,24 +1,43 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Assuming Link is used for navigation or can be removed if not needed
+import * as React from 'react';
+import { useLocation } from 'react-router-dom';
 
-interface HeaderProps {
-  title: string;
-}
+const Header: React.FC = () => {
+  const location = useLocation();
+  const getTitle = () => {
+    if (location.pathname.includes('/connections')) {
+      return 'Connection';
+    }
+    return 'Consolidated Account Report';
+  };
 
-const Header: React.FC<HeaderProps> = ({ title }) => {
+  const renderButtons = () => {
+    if (location.pathname.includes('/dashboard')) {
+      return (
+        <>
+          <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">
+            <span className="truncate">Export Report</span>
+          </button>
+          <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-search-bg-light dark:bg-search-bg-dark text-text-primary-light dark:text-text-primary-dark text-sm font-bold leading-normal tracking-[0.015em]">
+            <span className="truncate">Refresh Data</span>
+          </button>
+        </>
+      );
+    }
+    return null;
+  }
+
   return (
-    <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark px-6 py-3 bg-panel-light dark:bg-panel-dark flex-shrink-0 h-16">
-      <h2 className="text-lg font-bold leading-tight tracking-[-0.015em] text-text-primary-light dark:text-text-primary-dark">{title}</h2>
-      <div className="flex flex-1 justify-end gap-4 items-center">
-        {/* These buttons are specific to the Connections page, so they should ideally be in that page's Header.
-            For now, placing them here as per mockup and will make them conditional later if needed. */}
-        <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5">
+    <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-slate-200/10 bg-background-light/80 px-8 backdrop-blur-sm dark:bg-background-dark/80">
+      <h1 className="text-lg font-semibold text-slate-900 dark:text-white">{getTitle()}</h1>
+      <div className="flex items-center gap-4">
+        {renderButtons()}
+        <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800">
           <span className="material-symbols-outlined text-xl">notifications</span>
         </button>
-        <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full text-text-secondary-light dark:text-text-secondary-dark hover:bg-black/5 dark:hover:bg-white/5">
+        <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800">
           <span className="material-symbols-outlined text-xl">help</span>
         </button>
-        <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User avatar image" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDMYwGHah-qvsDx9c2AhpUxDCo7K7AK4ThTzCzIW9mZbh6F1VdHPvhYBzHV4Xo1MQ2qv8GCFaHeRXEVoHs6IvQk5EAnCSLPt-TUtslMHGaW7Gjj8ErLf0rCqAoplvIU9nA324f6eC9EeHnD0SKJC0lLjuMl8qXHpjAU7QVTPoVgUiXE3kiy4eeHS0FmZVzhsF5K_cMo5RvxE_bf7D0fphopbYcGMEpo4Nsy0E9Lt-vRA__4JZyeHrdRD7X0jmyt_oltAwSUi7upXQH7");'></div>
+        <div className="aspect-square size-10 rounded-full bg-cover bg-center bg-no-repeat" data-alt="User avatar image" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCdDfDWum4h4VQ_-Iq7pnnhIgODKjzchrgLKPokDc0bRqSH8ahnICKvQ53dvlxDGz20EejLiPPjpfuTU4ZBCsPUo-2KfZIpvTH_TI7Av05KYIWpvJbZWk-Wfc2wt7t8DFCG8i3pvKTY2VnbA7MJMywPeM8e0CJWhyqtysdwhuTCqlbu8AUuJqmfkLZxZ5aZ_GN9i38xKqw8dROlyB62LdwuPswB9akiMABYBNvOkvvQo4ebjBH5wowv7-siLUeoyJA2zFlBDEdhoNhJ")'}}></div>
       </div>
     </header>
   );

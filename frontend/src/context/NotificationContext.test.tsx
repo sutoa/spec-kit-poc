@@ -1,7 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { NotificationProvider, useNotification } from './NotificationContext';
-import { Notification } from '../components/Notification';
 import { vi } from 'vitest';
 
 vi.useFakeTimers();
@@ -56,7 +54,7 @@ describe('NotificationProvider and Notification Component', () => {
     fireEvent.click(screen.getByText('Show Success'));
     expect(screen.getByText('Success message')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('X'));
+    fireEvent.click(screen.getByRole('button', { name: /close notification/i }));
     expect(screen.queryByText('Success message')).not.toBeInTheDocument();
   });
 });

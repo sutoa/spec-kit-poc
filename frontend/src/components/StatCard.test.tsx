@@ -1,7 +1,5 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import StatCard from './StatCard';
-import { vi } from 'vitest';
 
 describe('StatCard', () => {
   it('renders title and value correctly', () => {

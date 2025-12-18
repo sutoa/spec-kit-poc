@@ -1,6 +1,6 @@
 import { getInstitutions, connectInstitution, getDashboardData } from './api';
 import axios from 'axios';
-import { vi } from 'vitest';
+import { vi, Mock as ViMock } from 'vitest';
 
 vi.mock('axios');
 
@@ -11,8 +11,8 @@ describe('API Service', () => {
 
   describe('getInstitutions', () => {
     it('fetches institutions successfully', async () => {
-      const mockInstitutions = [{ id: '1', name: 'Bank A', status: 'disconnected' }];
-      (axios.get as Mock).mockResolvedValueOnce({ data: mockInstitutions });
+      const mockInstitutions = [{ id: 1, external_id: 'inst1', name: 'Bank A', status: 'disconnected' }]; // id changed to number
+      (axios.get as ViMock).mockResolvedValueOnce({ data: mockInstitutions });
 
       const institutions = await getInstitutions();
       expect(institutions).toEqual(mockInstitutions);
@@ -21,7 +21,7 @@ describe('API Service', () => {
 
     it('handles errors when fetching institutions', async () => {
       const errorMessage = 'Network Error';
-      (axios.get as Mock).mockRejectedValueOnce(new Error(errorMessage));
+      (axios.get as ViMock).mockRejectedValueOnce(new Error(errorMessage));
 
       await expect(getInstitutions()).rejects.toThrow(errorMessage);
     });
@@ -30,25 +30,25 @@ describe('API Service', () => {
   describe('connectInstitution', () => {
     it('connects to an institution successfully', async () => {
       const mockRedirectUri = { redirect_uri: 'https://snaptrade.com/redirect' };
-      (axios.post as Mock).mockResolvedValueOnce({ data: mockRedirectUri });
+      (axios.post as ViMock).mockResolvedValueOnce({ data: mockRedirectUri });
 
-      const result = await connectInstitution('test-inst-id');
+      const result = await connectInstitution(1); // id changed to number
       expect(result).toEqual(mockRedirectUri);
-      expect(axios.post).toHaveBeenCalledWith('http://127.0.0.1:8000/snaptrade/connect', { institution_id: 'test-inst-id' });
+      expect(axios.post).toHaveBeenCalledWith('http://127.0.0.1:8000/snaptrade/connect', { institution_id: 1 }); // id changed to number
     });
 
     it('handles errors when connecting to an institution', async () => {
       const errorMessage = 'Connection Failed';
-      (axios.post as Mock).mockRejectedValueOnce(new Error(errorMessage));
+      (axios.post as ViMock).mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(connectInstitution('test-inst-id')).rejects.toThrow(errorMessage);
+      await expect(connectInstitution(1)).rejects.toThrow(errorMessage); // id changed to number
     });
   });
 
   describe('getDashboardData', () => {
     it('fetches dashboard data successfully without asOfDate', async () => {
       const mockDashboardData = { grand_total: 1000, institutions: [] };
-      (axios.get as Mock).mockResolvedValueOnce({ data: mockDashboardData });
+      (axios.get as ViMock).mockResolvedValueOnce({ data: mockDashboardData });
 
       const dashboardData = await getDashboardData();
       expect(dashboardData).toEqual(mockDashboardData);
@@ -57,7 +57,7 @@ describe('API Service', () => {
 
     it('fetches dashboard data successfully with asOfDate', async () => {
       const mockDashboardData = { grand_total: 500, institutions: [] };
-      (axios.get as Mock).mockResolvedValueOnce({ data: mockDashboardData });
+      (axios.get as ViMock).mockResolvedValueOnce({ data: mockDashboardData });
 
       const asOfDate = '2023-01-01';
       const dashboardData = await getDashboardData(asOfDate);
@@ -67,10 +67,9 @@ describe('API Service', () => {
 
     it('handles errors when fetching dashboard data', async () => {
       const errorMessage = 'Dashboard fetch failed';
-      (axios.get as Mock).mockRejectedValueOnce(new Error(errorMessage));
+      (axios.get as ViMock).mockRejectedValueOnce(new Error(errorMessage));
 
       await expect(getDashboardData()).rejects.toThrow(errorMessage);
     });
   });
 });
-

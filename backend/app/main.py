@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import httpx
 import os
@@ -18,6 +19,19 @@ configure_logging() # Configure logging at startup
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# CORS configuration
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Dependency

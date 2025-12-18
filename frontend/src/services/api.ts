@@ -7,7 +7,7 @@ export const getInstitutions = async () => {
   return response.data;
 };
 
-export const connectInstitution = async (institutionId: string) => {
+export const connectInstitution = async (institutionId: number) => {
   const response = await axios.post(`${API_URL}/snaptrade/connect`, { institution_id: institutionId });
   return response.data;
 };

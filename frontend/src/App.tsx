@@ -1,41 +1,27 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/Layout';
 import DashboardPage from './pages/DashboardPage';
 import ConnectionsPage from './pages/ConnectionsPage';
-import { NotificationProvider, useNotification } from './context/NotificationContext';
-
-const AppContent = () => {
-  const { showNotification } = useNotification();
-
-  return (
-    <Routes>
-      <Route
-        path="/dashboard"
-        element={
-          <Layout title="Consolidated Account Report">
-            <DashboardPage />
-          </Layout>
-        }
-      />
-      <Route
-        path="/connections"
-        element={
-          <Layout title="Manage Financial Institutions">
-            <ConnectionsPage />
-          </Layout>
-        }
-      />
-      {/* Redirect any other unmatched paths to dashboard */}
-      <Route path="/*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
-  );
-};
+import { NotificationProvider } from './context/NotificationContext';
+import SideNav from './components/SideNav';
+import Header from './components/Header';
 
 const App = () => {
   return (
-      <NotificationProvider>
-        <AppContent />
-      </NotificationProvider>
+    <NotificationProvider>
+      <div className="flex h-screen bg-background-light dark:bg-background-dark font-display">
+        <SideNav />
+        <div className="flex-1 flex flex-col">
+          <Header />
+          <main className="flex-1 overflow-hidden">
+            <Routes>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/connections" element={<ConnectionsPage />} />
+              <Route path="/*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </main>
+        </div>
+      </div>
+    </NotificationProvider>
   );
 };
 
