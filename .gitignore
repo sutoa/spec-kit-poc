@@ -24,3 +24,12 @@ Thumbs.db
 *.swp
 .vscode/
 .idea/
+
+# Python logs
+*.log
+
+# More .env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

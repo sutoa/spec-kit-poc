@@ -1,94 +1,67 @@
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { format } from 'date-fns';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css'; // Import the default styles
 
 interface DashboardFilterPanelProps {
-  onDateChange: (date: string) => void;
-  onRefresh: () => void;
-  institutions: string[];
+  onFilterChange: (asOfDate: Date | undefined) => void;
+  currentAsOfDate: Date | undefined;
 }
 
-const DashboardFilterPanel: React.FC<DashboardFilterPanelProps> = ({ onDateChange, onRefresh, institutions }) => {
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedInstitutions, setSelectedInstitutions] = useState<string[]>(institutions);
+const DashboardFilterPanel: React.FC<DashboardFilterPanelProps> = ({ onFilterChange, currentAsOfDate }) => {
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(currentAsOfDate);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
-  const handleDateInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedDate(event.target.value);
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
+    onFilterChange(date);
+    setIsDatePickerOpen(false);
   };
-
-  const handleApplyFilters = () => {
-    onDateChange(selectedDate);
-    // In a real app, you'd also pass the selected institutions up
-    onRefresh();
-  };
-  
-  const filteredInstitutions = institutions.filter(inst =>
-    inst.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
-    <div className="flex flex-col gap-4 h-full">
-      <h1 className="text-text-primary-light dark:text-text-primary-dark text-base font-medium leading-normal">Filters</h1>
+    <div className="w-full lg:w-1/4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Filters</h3>
       
-      <label className="flex flex-col w-full">
-        <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium pb-1.5">As of Date</p>
-        <div className="flex w-full flex-1 items-stretch rounded-lg">
+      <div className="mb-4">
+        <label htmlFor="asOfDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          As of Date
+        </label>
+        <div className="mt-1 relative">
           <input
-            type="date"
-            value={selectedDate}
-            onChange={handleDateInputChange}
-            className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark focus:border-primary h-10 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark p-2 text-sm font-normal leading-normal rounded-r-none border-r-0"
+            type="text"
+            id="asOfDate"
+            readOnly
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2"
+            value={selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''}
+            onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+            placeholder="Select date"
           />
-          <div className="text-text-secondary-light dark:text-text-secondary-dark flex border border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark items-center justify-center pr-3 rounded-r-lg border-l-0">
-            <span className="material-symbols-outlined text-lg">calendar_today</span>
-          </div>
-        </div>
-      </label>
-
-      <div className="flex flex-col gap-2">
-        <h2 className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium">Institutions</h2>
-        <div className="w-full">
-          <label className="flex flex-col min-w-40 h-10 w-full">
-            <div className="flex w-full flex-1 items-stretch rounded-lg h-full">
-              <div className="text-text-secondary-light dark:text-text-secondary-dark flex border-none bg-search-bg-light dark:bg-search-bg-dark items-center justify-center pl-3 rounded-l-lg">
-                <span className="material-symbols-outlined text-lg">search</span>
-              </div>
-              <input
-                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-0 border-none bg-search-bg-light dark:bg-search-bg-dark focus:border-none h-full placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-3 rounded-l-none pl-2 text-sm font-normal leading-normal"
-                placeholder="Find institution"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+          {isDatePickerOpen && (
+            <div className="absolute z-10 bg-white dark:bg-gray-700 rounded-lg shadow-lg mt-2">
+              <DayPicker
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                // Tailwind classes for react-day-picker, to match the UI. These are example classes.
+                classNames={{
+                  caption_label: 'text-gray-900 dark:text-white',
+                  nav_button: 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600',
+                  day: 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600',
+                  day_selected: 'bg-primary text-white hover:bg-primary-dark',
+                  day_today: 'text-primary'
+                }}
               />
             </div>
-          </label>
-        </div>
-        <div className="flex flex-col -mx-2 px-2 overflow-y-auto">
-          {filteredInstitutions.map((inst, index) => (
-            <label key={index} className="flex gap-x-2.5 py-2.5 flex-row items-center cursor-pointer">
-              <input
-                checked={selectedInstitutions.includes(inst)}
-                onChange={() => {
-                  setSelectedInstitutions(prev => 
-                    prev.includes(inst) ? prev.filter(id => id !== inst) : [...prev, inst]
-                  );
-                }}
-                className="h-4 w-4 rounded border-input-border-light dark:border-input-border-dark border-2 bg-transparent text-primary checked:bg-primary checked:border-primary checked:bg-[image:var(--checkbox-tick-svg)] focus:ring-2 focus:ring-offset-0 focus:ring-primary/50 focus:ring-offset-panel-light dark:focus:ring-offset-panel-dark focus:outline-none"
-                type="checkbox"
-              />
-              <p className="text-text-primary-light dark:text-text-primary-dark text-sm font-normal leading-normal">{inst}</p>
-            </label>
-          ))}
+          )}
         </div>
       </div>
 
-      <button
-        onClick={handleApplyFilters}
-        className="w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] mt-auto"
-      >
-        <span className="truncate">Apply Filters</span>
-      </button>
+      {/* Placeholder for future institution checkboxes (post-MVP) */}
+      <div>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Institution filter (post-MVP)</p>
+      </div>
     </div>
   );
 };
 
-export default DashboardFilterPanel;
+export default React.memo(DashboardFilterPanel);

@@ -27,9 +27,9 @@ Python 3.11+ (Backend), TypeScript/ES2022 (Frontend): Follow standard convention
 
 ## Recent Changes
 - 002-account-reporting-utility: Added Python 3.11+, TypeScript/ES2022
+- 002-account-reporting-utility: Added Python 3.11+, TypeScript/ES2022
 - 002-account-reporting-utility: Added Python 3.11+ (Backend), TypeScript/ES2022 (Frontend)
 
-- 002-account-reporting-utility: Added Python 3.11+ (Backend), TypeScript/ES2022 (Frontend)
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

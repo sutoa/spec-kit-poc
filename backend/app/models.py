@@ -1,19 +1,16 @@
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from sqlalchemy.orm import relationship
-
-from .database import Base
-
+from backend.app.database import Base
 
 class Institution(Base):
     __tablename__ = "institutions"
 
     id = Column(Integer, primary_key=True, index=True)
     external_id = Column(String, unique=True, index=True)
-    name = Column(String)
+    name = Column(String, index=True)
     status = Column(String)
 
     accounts = relationship("Account", back_populates="institution")
-
 
 class Account(Base):
     __tablename__ = "accounts"

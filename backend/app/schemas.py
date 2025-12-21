@@ -1,7 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, field_validator
 from datetime import date
-from typing import List, Optional
+from typing import Optional, List
 
+class InstitutionBase(BaseModel):
+    external_id: str
+    name: str
+
+class InstitutionCreate(InstitutionBase):
+    pass
+
+class Institution(InstitutionBase):
+    id: int
+    model_config = ConfigDict(from_attributes=True)
 
 class AccountBase(BaseModel):
     external_id: str
@@ -9,42 +19,26 @@ class AccountBase(BaseModel):
     balance: float
     as_of_date: date
 
+    @field_validator('balance')
+    def balance_must_be_positive(cls, v):
+        if v < 0:
+            raise ValueError('balance must be positive')
+        return v
 
 class AccountCreate(AccountBase):
-    pass
-
-
-class Account(AccountBase):
-    id: Optional[int] = None # Make ID optional, as it's assigned by DB
     institution_id: int
 
-    class Config:
-        orm_mode = True
-
-
-class InstitutionBase(BaseModel):
-    external_id: str
-    name: str
-    status: str
-
-
-class InstitutionCreate(InstitutionBase):
-    pass
-
-
-class Institution(InstitutionBase):
+class Account(AccountBase):
     id: int
-    accounts: List[Account] = []
-    sub_total: float # Add sub_total to Institution schema
+    institution_id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
+class DashboardInstitution(BaseModel):
+    institution: Institution
+    accounts: List[Account]
+    sub_total: float
 
-class Dashboard(BaseModel):
+class DashboardResponse(BaseModel):
     grand_total: float
-    institutions: List[Institution]
-
-class SnapTradeConnectRequest(BaseModel):
-    institution_id: str
-
+    institutions: List[DashboardInstitution]

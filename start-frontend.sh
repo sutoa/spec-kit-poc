@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
 cd frontend
 npm run dev

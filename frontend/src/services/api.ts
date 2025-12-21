@@ -7,8 +7,14 @@ export const getInstitutions = async () => {
   return response.data;
 };
 
-export const connectInstitution = async (institutionId: number) => {
-  const response = await axios.post(`${API_URL}/snaptrade/connect`, { institution_id: institutionId });
+export const initiateSnapTradeConnect = async (institutionExternalId: string): Promise<{ redirect_uri: string }> => {
+  const response = await axios.post(`${API_URL}/snaptrade/connect`, { institution_id: institutionExternalId });
+  // Assuming the backend returns { redirect_uri: "..." }
+  return { redirect_uri: response.data.redirect_uri };
+};
+
+export const handleSnapTradeCallback = async (publicToken: string) => {
+  const response = await axios.post(`${API_URL}/snaptrade/callback`, { public_token: publicToken });
   return response.data;
 };
 

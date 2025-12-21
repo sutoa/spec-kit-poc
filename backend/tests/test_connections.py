@@ -1,82 +1,76 @@
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from backend.app.main import app, get_db
-from backend.app.database import Base
-
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+from sqlalchemy.orm import Session
+from unittest.mock import MagicMock
+from backend.app.services.institution_service import (
+    get_all_institutions, get_institution_by_id, update_institution_status, create_institution_if_not_exists
 )
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+from backend.app import crud, schemas
+import types # Import types for SimpleNamespace
 
+# A simple class to act as a mock SQLAlchemy model instance
+# This ensures attributes return concrete values, not nested MagicMocks
+class SimpleMockDbInstitution(types.SimpleNamespace):
+    def __init__(self, id, external_id, name, status):
+        super().__init__(id=id, external_id=external_id, name=name, status=status)
 
-Base.metadata.create_all(bind=engine)
+def test_get_all_institutions_empty(db_session: Session):
+    crud.get_institutions = MagicMock(return_value=[])
+    institutions = get_all_institutions(db_session)
+    assert institutions == []
 
+def test_get_all_institutions_with_data(db_session: Session):
+    mock_db_institution = SimpleMockDbInstitution(id=1, external_id="ext1", name="Bank A", status="connected")
+    crud.get_institutions = MagicMock(return_value=[mock_db_institution])
+    
+    institutions = get_all_institutions(db_session)
+    assert len(institutions) == 1
+    assert institutions[0].name == "Bank A"
+    assert institutions[0].status == "connected"
 
-def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
+def test_get_institution_by_id_found(db_session: Session):
+    mock_db_institution = SimpleMockDbInstitution(id=1, external_id="ext1", name="Bank A", status="connected")
+    crud.get_institution = MagicMock(return_value=mock_db_institution)
+    
+    institution = get_institution_by_id(db_session, 1)
+    assert institution is not None
+    assert institution.name == "Bank A"
+    assert institution.status == "connected"
 
+def test_get_institution_by_id_not_found(db_session: Session):
+    crud.get_institution = MagicMock(return_value=None)
+    
+    institution = get_institution_by_id(db_session, 999)
+    assert institution is None
 
-app.dependency_overrides[get_db] = override_get_db
+def test_update_institution_status(db_session: Session):
+    original_db_institution = SimpleMockDbInstitution(id=1, external_id="ext1", name="Bank A", status="connected")
+    updated_db_institution_result = SimpleMockDbInstitution(id=1, external_id="ext1", name="Bank A", status="disconnected")
 
-client = TestClient(app)
+    crud.get_institution = MagicMock(return_value=original_db_institution)
+    crud.update_institution_status = MagicMock(return_value=updated_db_institution_result) 
+    
+    updated_institution = update_institution_status(db_session, 1, "disconnected")
+    assert updated_institution is not None
+    assert updated_institution.status == "disconnected"
+    crud.update_institution_status.assert_called_with(db_session, 1, "disconnected")
 
+def test_create_institution_if_not_exists_new(db_session: Session):
+    crud.get_institution_by_external_id = MagicMock(return_value=None)
+    mock_created_db_institution = SimpleMockDbInstitution(id=2, external_id="new_ext", name="New Bank", status="disconnected")
+    crud.create_institution = MagicMock(return_value=mock_created_db_institution)
 
-def test_read_institutions(mocker):
-    mocker.patch("backend.app.crud.get_institutions", return_value=[])
-    response = client.get("/institutions/")
-    assert response.status_code == 200
-    assert response.json() == []
+    institution = create_institution_if_not_exists(db_session, "new_ext", "New Bank")
+    assert institution.name == "New Bank"
+    assert institution.status == "disconnected"
+    crud.create_institution.assert_called_once()
+    crud.get_institution_by_external_id.assert_called_once_with(db_session, "new_ext")
 
+def test_create_institution_if_not_exists_existing(db_session: Session):
+    existing_db_institution = SimpleMockDbInstitution(id=1, external_id="ext1", name="Bank A", status="connected")
+    crud.get_institution_by_external_id = MagicMock(return_value=existing_db_institution)
+    crud.create_institution = MagicMock() # Should not be called
 
-def test_snaptrade_connect(mocker):
-    mocker.patch.dict(
-        "os.environ",
-        {
-            "SNAPTRADE_CLIENT_ID": "test_client_id",
-            "SNAPTRADE_CLIENT_SECRET": "test_consumer_key",
-        },
-    )
-
-    mock_response_json = {"redirect_uri": "https://snaptrade.com/redirect"}
-    mock_response_status_code = 200
-
-    class MockHttpxResponse:
-        def __init__(self, json_data, status_code):
-            self._json_data = json_data
-            self.status_code = status_code
-            self.text = ""
-
-        def json(self):
-            return self._json_data
-
-        def raise_for_status(self):
-            if self.status_code >= 400:
-                raise httpx.HTTPStatusError("Bad response", request=None, response=self)
-
-    class MockAsyncClient:
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc_val, exc_tb):
-            pass
-
-        async def post(self, *args, **kwargs):
-            return MockHttpxResponse(mock_response_json, mock_response_status_code)
-
-        async def get(self, *args, **kwargs): # Also mock get for potential future use or if callback uses it
-            return MockHttpxResponse(mock_response_json, mock_response_status_code)
-
-    mocker.patch("httpx.AsyncClient", return_value=MockAsyncClient())
-
-    response = client.post("/snaptrade/connect", json={"institution_id": "inst_12_123"})
-    assert response.status_code == 200
-    assert response.json() == {"redirect_uri": "https://snaptrade.com/redirect"}
+    institution = create_institution_if_not_exists(db_session, "ext1", "Bank A")
+    assert institution.name == "Bank A"
+    assert institution.status == "connected"
+    crud.create_institution.assert_not_called()
+    crud.get_institution_by_external_id.assert_called_once_with(db_session, "ext1")

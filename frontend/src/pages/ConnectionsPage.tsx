@@ -1,43 +1,50 @@
-import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { getInstitutions, connectInstitution } from '../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import Header from '../components/Header';
 import ConnectionCard from '../components/ConnectionCard';
+import { getInstitutions } from '../services/api';
 import { Institution } from '../types/connection';
+import { useNotification } from '../context/NotificationContext';
+import { SnapTradeError, SnapTradeSuccessData } from '../snaptrade-sdk';
 
 const ConnectionsPage: React.FC = () => {
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const { showNotification } = useNotification();
+
+  const loadInstitutions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getInstitutions();
+      const sortedData = data.sort((a: Institution, b: Institution) => {
+        if (a.status === 'connected' && b.status !== 'connected') return -1;
+        if (a.status !== 'connected' && b.status === 'connected') return 1;
+        return a.name.localeCompare(b.name);
+      });
+      setInstitutions(sortedData);
+    } catch (error) {
+      console.error('Failed to fetch institutions:', error);
+      showNotification('Failed to load institutions. Please try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }, [showNotification]);
 
   useEffect(() => {
-    const fetchInstitutions = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getInstitutions();
-        setInstitutions(data);
-      } catch (err: any) {
-        setError(err.message || "Error fetching institutions");
-        console.error("Error fetching institutions:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    loadInstitutions();
+  }, [loadInstitutions]);
 
-    fetchInstitutions();
-  }, []);
+  const handleSuccess = (data: SnapTradeSuccessData) => {
+    showNotification(`Successfully connected institution with ID: ${data.connectionId}`, 'success');
+    loadInstitutions();
+  };
 
-  const handleConnect = async (institutionId: number) => { // Changed type to number
-    try {
-      const data = await connectInstitution(institutionId);
-      if (data.redirect_uri) {
-        window.location.href = data.redirect_uri;
-      }
-    } catch (err: any) {
-      setError(err.message || "Error connecting to institution");
-      console.error('Error connecting to institution:', err);
-    }
+  const handleError = (error: SnapTradeError) => {
+    showNotification(error.message, 'error');
+  };
+
+  const handleClose = () => {
+    showNotification('Connection process cancelled.', 'info');
   };
 
   const filteredInstitutions = institutions.filter(inst =>
@@ -45,47 +52,64 @@ const ConnectionsPage: React.FC = () => {
   );
 
   return (
-    <div className="p-8">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-col gap-2">
-            <p className="text-4xl font-black leading-tight tracking-[-0.033em] text-slate-900 dark:text-white">Manage Financial Institutions</p>
-            <p className="text-base font-normal text-slate-500 dark:text-slate-400">Connect your accounts to consolidate all your financial data in one place.</p>
-          </div>
-          <button 
-            onClick={() => handleConnect(1)} // Changed to pass a number
-            className="flex h-10 min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-5 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary/90"
-          >
-            <span className="material-symbols-outlined text-lg">add</span>
-            <span className="truncate">Add New Connection</span>
-          </button>
-        </div>
-        <div className="mb-6">
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 dark:text-slate-500">
-              <span className="material-symbols-outlined text-xl">search</span>
-            </div>
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <Header
+        title="Manage Financial Institutions"
+        showNotifications={true}
+        showHelp={true}
+      />
+      <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900 p-6">
+        <div className="container mx-auto px-6 py-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Manage Financial Institutions</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            Connect your bank, brokerage, and crypto accounts to get a consolidated view.
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <button
+              className="px-6 py-3 bg-primary text-white rounded-lg font-semibold shadow-md hover:bg-primary-dark transition-colors w-full sm:w-auto"
+            >
+              Add New Connection
+            </button>
+
             <input
-              className="block w-full rounded-lg border-slate-300 bg-white p-3 pl-12 text-sm text-slate-900 placeholder-slate-400 focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500 dark:focus:border-primary"
-              placeholder="Search for an institution..."
-              type="search"
+              type="text"
+              placeholder="Search institutions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full sm:w-1/3 p-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 h-48 animate-pulse"></div>
+              ))}
+            </div>
+          ) : filteredInstitutions.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5 text-center text-gray-500 dark:text-gray-400">
+              <p className="text-xl font-semibold mb-2">No institutions found.</p>
+              <p>Try adjusting your search or add a new connection.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredInstitutions.map((inst) => (
+                <ConnectionCard
+                  key={inst.id}
+                  institution={inst}
+                  onSuccess={handleSuccess}
+                  onError={handleError}
+                  onClose={handleClose}
+                />
+              ))}
+            </div>
+          )}
         </div>
-        {loading && <div>Loading connections...</div>}
-        {error && <div className="text-red-500">Error: {error}</div>}
-        {!loading && !error && (
-          <div className="grid grid-cols-1 gap-6 @lg:grid-cols-2 @4xl:grid-cols-3">
-            {filteredInstitutions.map((inst) => (
-              <ConnectionCard key={inst.id} institution={inst} />
-            ))}
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   );
 };
 
 export default ConnectionsPage;
+

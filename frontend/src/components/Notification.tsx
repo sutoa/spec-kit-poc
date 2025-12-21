@@ -1,36 +1,47 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
+type NotificationStatus = 'success' | 'error' | 'info';
 
 interface NotificationProps {
-  message: string | null;
-  type: 'success' | 'error' | 'info' | null;
+  message: string;
+  status: NotificationStatus;
   onClose: () => void;
 }
 
-export const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) => {
+const Notification: React.FC<NotificationProps> = ({ message, status, onClose }) => {
+  const [visible, setVisible] = useState(false);
+
   useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 5000); // Auto-close after 5 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [message, onClose]);
+    setVisible(true);
+    const timer = setTimeout(() => {
+      handleClose();
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [message]);
 
-  if (!message || !type) {
-    return null;
-  }
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(onClose, 300); // Wait for fade-out animation
+  };
 
-  const baseClasses = 'fixed top-5 right-5 p-4 rounded-lg shadow-lg text-white transition-opacity duration-300';
-  const typeClasses = {
+  const statusStyles = {
     success: 'bg-green-500',
     error: 'bg-red-500',
     info: 'bg-blue-500',
   };
 
   return (
-    <div className={`${baseClasses} ${typeClasses[type]}`}>
+    <div
+      className={`fixed bottom-5 right-5 p-4 rounded-lg text-white shadow-lg transition-opacity duration-300 ${
+        visible ? 'opacity-100' : 'opacity-0'
+      } ${statusStyles[status]}`}
+    >
       <span>{message}</span>
-      <button onClick={onClose} className="ml-4 font-bold">X</button>
+      <button onClick={handleClose} className="ml-4 font-bold">
+        &times;
+      </button>
     </div>
   );
 };
+
+export default React.memo(Notification);

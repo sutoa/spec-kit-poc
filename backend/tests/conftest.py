@@ -3,7 +3,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from starlette.testclient import TestClient
 from backend.app.models import Base
-from backend.app.main import app, get_db
+from backend.app.main import app
+from backend.app.database import Base, get_db
 
 @pytest.fixture(scope="session")
 def engine():

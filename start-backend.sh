@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
-cd backend
-source venv/bin/activate
-uvicorn app.main:app --reload
+#!/bin/bash
+source backend/venv/bin/activate
+uvicorn backend.app.main:app --reload --port 8000

@@ -1,8 +1,9 @@
 from typing import Any, Dict, Optional
 import time
+from backend.app.config import settings
 
 class Cache:
-    def __init__(self, ttl: int = 300):  # Default TTL of 5 minutes
+    def __init__(self, ttl: int):
         self._cache: Dict[str, Dict[str, Any]] = {}
         self.ttl = ttl
 
@@ -12,7 +13,7 @@ class Cache:
             if time.time() < data["expiry"]:
                 return data["value"]
             else:
-                self.delete(key)  # Expired
+                self.delete(key)
         return None
 
     def set(self, key: str, value: Any, ttl: Optional[int] = None):
@@ -26,4 +27,4 @@ class Cache:
     def clear(self):
         self._cache = {}
 
-cache = Cache()
+cache = Cache(ttl=settings.CACHE_TTL)

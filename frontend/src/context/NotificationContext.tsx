@@ -1,36 +1,39 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Notification } from '../components/Notification'; // Import the Notification component
+import Notification from '../components/Notification';
+
+type NotificationStatus = 'success' | 'error' | 'info';
 
 interface NotificationState {
-  message: string | null;
-  type: 'success' | 'error' | 'info' | null;
+  message: string;
+  status: NotificationStatus;
 }
 
 interface NotificationContextType {
-  showNotification: (message: string, type: 'success' | 'error' | 'info') => void;
+  showNotification: (message: string, status: NotificationStatus) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [notification, setNotification] = useState<NotificationState>({ message: null, type: null });
+  const [notification, setNotification] = useState<NotificationState | null>(null);
 
-  const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
-    setNotification({ message, type });
-  };
-
-  const handleCloseNotification = () => {
-    setNotification({ message: null, type: null });
+  const showNotification = (message: string, status: NotificationStatus) => {
+    setNotification({ message, status });
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
   };
 
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       {children}
-      <Notification
-        message={notification.message}
-        type={notification.type}
-        onClose={handleCloseNotification}
-      />
+      {notification && (
+        <Notification
+          message={notification.message}
+          status={notification.status}
+          onClose={() => setNotification(null)}
+        />
+      )}
     </NotificationContext.Provider>
   );
 };

@@ -1,47 +1,60 @@
-import * as React from 'react';
-
-interface Account {
-  masked_account_number: string;
-  balance: number;
-  as_of_date: string;
-}
-
-interface InstitutionData {
-  name: string;
-  accounts: Account[];
-  sub_total: number;
-}
+import React from 'react';
+import { DashboardInstitution, Account } from '../types/dashboard';
 
 interface ReportTableProps {
-  institutions: InstitutionData[];
-  grandTotal: number;
+  institutions: DashboardInstitution[];
 }
 
 const ReportTable: React.FC<ReportTableProps> = ({ institutions }) => {
+  if (!institutions || institutions.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5 text-center text-gray-500 dark:text-gray-400">
+        No institution data available.
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-4">
-      {institutions.map((institution, instIndex) => (
-        <div key={instIndex} className="bg-panel-light dark:bg-panel-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden">
-          <div className="p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50 dark:bg-white/5">
-            <h3 className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark tracking-tight">{institution.name}</h3>
-            <div className="text-right">
-              <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Sub-total</p>
-              <p className="font-bold text-lg text-text-primary-light dark:text-text-primary-dark">${institution.sub_total.toFixed(2)}</p>
-            </div>
+    <div className="mt-8">
+      {institutions.map((instData) => (
+        <div key={instData.institution.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6">
+          <div className="px-5 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h4 className="text-lg font-semibold text-gray-800 dark:text-white">{instData.institution.name}</h4>
+            <span className="text-md font-bold text-gray-700 dark:text-gray-300">
+              Subtotal: ${instData.sub_total.toFixed(2)}
+            </span>
           </div>
-          <div className="divide-y divide-border-light dark:divide-border-dark">
-            {institution.accounts.map((account, accIndex) => (
-              <div key={accIndex} className="grid grid-cols-4 gap-4 p-3 items-center">
-                <div className="col-span-2">
-                  <p className="font-medium text-text-primary-light dark:text-text-primary-dark text-sm">Account</p>
-                  <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark font-mono">•••• {account.masked_account_number}</p>
-                </div>
-                <div className="text-right col-span-2">
-                  <p className="font-medium text-base text-text-primary-light dark:text-text-primary-dark">${account.balance.toFixed(2)}</p>
-                  <p className="text-[10px] text-text-secondary-light dark:text-text-secondary-dark">as of {new Date(account.as_of_date).toLocaleDateString()}</p>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Account Number
+                  </th>
+                  <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Balance
+                  </th>
+                  <th scope="col" className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    As of Date
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {instData.accounts.map((account: Account) => (
+                  <tr key={account.id}>
+                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                      {account.masked_account_number}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                      ${account.balance.toFixed(2)}
+                    </td>
+                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                      {account.as_of_date.toString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       ))}
@@ -49,4 +62,4 @@ const ReportTable: React.FC<ReportTableProps> = ({ institutions }) => {
   );
 };
 
-export default ReportTable;
+export default React.memo(ReportTable);

@@ -1,11 +1,12 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    snaptrade_client_id: str = "test_client_id"
-    snaptrade_client_secret: str = "test_client_secret"
-    secret_key: str = "your-secret-key"  # CHANGE THIS IN PRODUCTION
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
 
-    class Config:
-        env_file = ".env"
+    DATABASE_URL: str = "sqlite:///./account_viewer.db"
+    SNAPTRADE_CLIENT_ID: str
+    SNAPTRADE_CONSUMER_KEY: str
+    SNAPTRADE_REDIRECT_URI: str = "http://localhost:5173/snaptrade/callback" # Example default
+    CACHE_TTL: int = 300
 
 settings = Settings()
