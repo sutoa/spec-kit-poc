@@ -1,14 +1,9 @@
----
-
-description: "Task list template for feature implementation"
----
-
 # Tasks: Account Reporting Utility
 
 **Input**: Design documents from `/specs/002-account-reporting-utility/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification or if user requests TDD approach.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -25,17 +20,20 @@ description: "Task list template for feature implementation"
 - **Mobile**: `api/src/`, `ios/src/` or `android/src/`
 - Paths shown below assume single project - adjust based on plan.md structure
 
+---
+**IMPORTANT NOTE ON CURRENT FOCUS**:
+As per user instruction, this task list prioritizes frontend development, specifically to ensure the Visual Loop is enforced for UI components. Backend implementation tasks (including foundational and backend-specific user story tasks) are assumed to be either already completed or sufficiently stable to support frontend development. They will only be revisited if absolutely necessary to unblock a frontend task or visual verification.
+---
+
 ## Phase 1: Setup (Shared Infrastructure)
 
 **Purpose**: Project initialization and basic structure
 
-- [X] T001 Create Python virtual environment for backend in `backend/venv/`
-- [X] T002 Install backend dependencies from `backend/requirements.txt`
-- [X] T003 Install Node.js dependencies for frontend in `frontend/`
-- [X] T004 [P] Create basic backend FastAPI application structure in `backend/app/main.py`
-- [X] T005 [P] Create basic frontend React application structure in `frontend/src/main.tsx`
-- [X] T006 Configure backend to run with uvicorn using `start-backend.sh`
-- [X] T007 Configure frontend to run with `npm run dev` using `start-frontend.sh`
+- [X] T001 Create project structure based on implementation plan (Python backend, React frontend)
+- [X] T002 Initialize Python backend with FastAPI, SQLAlchemy, Uvicorn, Pydantic in `backend/`
+- [X] T003 Initialize TypeScript frontend with React, Vite, Axios, Tailwind CSS, SnapTrade React SDK dependencies in `frontend/`
+- [X] T004 Configure linting (Ruff for Python, ESLint/Prettier for TypeScript) and formatting tools in `backend/` and `frontend/`
+- [X] T005 Set up Playwright for frontend visual regression testing in `frontend/`
 
 ---
 
@@ -45,15 +43,11 @@ description: "Task list template for feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [X] T008 Define Pydantic schemas for `Institution` and `Account` in `backend/app/schemas.py`.
-- [X] T009 Define SQLAlchemy models for `Institution` and `Account` in `backend/app/models.py`.
-- [X] T010 Implement database connection and session management in `backend/app/database.py`.
-- [X] T011 Initialize database tables (using Alembic or similar, or simple create_all for MVP) in `backend/app/database.py`.
-- [X] T012 Implement basic CRUD operations for `Institution` and `Account` in `backend/app/crud.py`.
-- [X] T013 Configure logging and error handling for the backend in `backend/app/logging_config.py` and `backend/app/main.py`.
-- [X] T014 Implement CORS middleware in `backend/app/main.py`.
-- [X] T015 Define base API routes and include them in `backend/app/main.py` based on `contracts/openapi.yaml`.
-- [X] T016 Create a `.env` file or similar for environment configuration in `backend/app/config.py`.
+- [ ] T006 Setup database (SQLite) schema and migrations framework (`backend/app/database.py`, `backend/app/models.py`)
+- [ ] T007 Implement basic security considerations: input sanitization, data escaping for UI (`backend/app/security.py`, `frontend/src/utils/security.ts`)
+- [ ] T008 Setup API routing and middleware structure in FastAPI (`backend/app/main.py`, `backend/app/routers/`)
+- [ ] T009 Configure error handling and logging infrastructure (`backend/app/logging_config.py`)
+- [ ] T010 Create base models/entities (Account, Institution) that all stories depend on (`backend/app/models.py`, `backend/app/schemas.py`, `frontend/src/types/connection.ts`, `frontend/src/types/dashboard.ts`)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -61,26 +55,29 @@ description: "Task list template for feature implementation"
 
 ## Phase 3: User Story 1 - View Consolidated Account Dashboard (Priority: P1) 🎯 MVP
 
-**Goal**: A user wants to view a consolidated report of their financial accounts, optionally filtered by "as-of date" and refreshed.
+**Goal**: A user can view a consolidated report of their financial accounts, optionally filtered by an "as-of date" and refreshed, with grouped accounts, sub-totals, and a grand total.
 
-**Independent Test**: Can be fully tested by configuring at least one financial institution, navigating to the Dashboard, and observing the generated report's accuracy and format.
+**Independent Test**: Can be fully tested by configuring at least one financial institution, navigating to the Dashboard, and observing the generated report's accuracy and format, including UI/UX fidelity (with 5px layout tolerance).
 
 ### Implementation for User Story 1
 
-- [X] T017 [US1] Implement `GET /dashboard` endpoint logic in `backend/app/main.py` based on `contracts/openapi.yaml` to retrieve account data.
-- [X] T018 [US1] Implement service logic to fetch and process account data for the dashboard, including handling "as-of date" and calculating sub-totals/grand totals in `backend/app/services/dashboard_service.py`.
-- [X] T019 [US1] Add unit tests for dashboard service logic in `backend/tests/test_dashboard.py`.
-- [X] T020 [US1] Implement main `DashboardPage` component structure and routing in `frontend/src/pages/DashboardPage.tsx` based on `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png` and `specs/002-account-reporting-utility/screens/dashboard_tab/code.html`.
-- [X] T021 [US1] Implement `Header` component for Dashboard page (with "Export Report", "Refresh Data" buttons, user avatar) in `frontend/src/components/Header.tsx` based on `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png` and `specs/002-account-reporting-utility/screens/dashboard_tab/code.html`.
-- [X] T022 [US1] Implement `SideNav` component (with Dashboard link active) in `frontend/src/components/SideNav.tsx` based on `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png` and `specs/002-account-reporting-utility/screens/dashboard_tab/code.html`.
-- [X] T023 [P] [US1] Implement `DashboardFilterPanel` component (with "As of Date" picker) in `frontend/src/components/DashboardFilterPanel.tsx` based on `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png` and `specs/002-account-reporting-utility/screens/dashboard_tab/code.html`.
-- [X] T024 [P] [US1] Implement `StatCard` component for high-level metrics (Grand Total, Total Institutions) in `frontend/src/components/StatCard.tsx` based on `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png` and `specs/002-account-reporting-utility/screens/dashboard_tab/code.html`.
-- [X] T025 [P] [US1] Implement `ReportTable` component to display institution-specific data and individual accounts in `frontend/src/components/ReportTable.tsx` based on `specs/002-account-reporting-utility/screens/dashboard_tab/screen.png` and `specs/002-account-reporting-utility/screens/dashboard_tab/code.html`.
-- [X] T026 [US1] Integrate `DashboardFilterPanel`, `StatCard`, and `ReportTable` into `DashboardPage` in `frontend/src/pages/DashboardPage.tsx`.
-- [X] T027 [US1] Implement API service client function to call `GET /dashboard` in `frontend/src/services/api.ts`.
-- [X] T028 [US1] Implement data fetching and state management for `DashboardPage` in `frontend/src/pages/DashboardPage.tsx`, including handling "as-of date" filter and refresh functionality.
-- [X] T029 [US1] Implement empty state for Dashboard when no connections exist in `frontend/src/pages/DashboardPage.tsx`.
-- [X] T030 [US1] Implement skeleton loader for dashboard data loading in `frontend/src/components/SkeletonLoader.tsx`.
+- [ ] T011 [US1] Create backend service for dashboard data retrieval and aggregation (`backend/app/services/dashboard_service.py`)
+- [ ] T012 [US1] Implement backend API endpoint for fetching dashboard data (`backend/app/routers/dashboard.py`)
+- [ ] T013 [P] [US1] Implement frontend API service for dashboard data (`frontend/src/services/api.ts`)
+- [ ] T014 [P] [US1] Create frontend `StatCard` component (`frontend/src/components/StatCard.tsx`)
+- [ ] T015 [P] [US1] Create Playwright visual regression test for `StatCard` component (`[VISUAL LOOP]` 5px tolerance) (`frontend/tests/visual/StatCard.spec.ts`)
+- [ ] T016 [P] [US1] Create frontend `ReportTable` component (`frontend/src/components/ReportTable.tsx`)
+- [ ] T017 [P] [US1] Create Playwright visual regression test for `ReportTable` component (`[VISUAL LOOP]` 5px tolerance) (`frontend/tests/visual/ReportTable.spec.ts`)
+- [ ] T018 [P] [US1] Create frontend `DashboardFilterPanel` component (as-of date picker, institutions checkboxes - *initially hidden/post-MVP for institutions*) (`frontend/src/components/DashboardFilterPanel.tsx`)
+- [ ] T019 [P] [US1] Create Playwright visual regression test for `DashboardFilterPanel` component (`[VISUAL LOOP]` 5px tolerance) (`frontend/tests/visual/DashboardFilterPanel.spec.ts`)
+- [ ] T020 [P] [US1] Create frontend `SkeletonLoader` component for dashboard data (`frontend/src/components/SkeletonLoader.tsx`)
+- [ ] T021 [P] [US1] Create Playwright visual regression test for `SkeletonLoader` component (`[VISUAL LOOP]` 5px tolerance) (`frontend/tests/visual/SkeletonLoader.spec.ts`)
+- [ ] T022 [US1] Implement `DashboardPage` assembling `DashboardFilterPanel`, `StatCard`s, `ReportTable`, and integrating API calls (`frontend/src/pages/DashboardPage.tsx`)
+- [ ] T023 [US1] Create Playwright visual regression test for `DashboardPage` (`[VISUAL LOOP]` 5px tolerance) covering empty state, loading state, and data display (`frontend/tests/visual/DashboardPage.spec.ts`)
+- [ ] T024 [P] [US1] Implement the "Refresh Data" button functionality on the dashboard, including disabling when no institutions are connected (`frontend/src/pages/DashboardPage.tsx`)
+- [ ] T025 [P] [US1] Implement the empty state logic for the Dashboard page prompting users to connect institutions (`frontend/src/pages/DashboardPage.tsx`)
+- [ ] T026 [P] [US1] Implement `Header` component for Dashboard page (title, export, refresh, avatar) (`frontend/src/components/Header.tsx`)
+- [ ] T027 [P] [US1] Create Playwright visual regression test for `Header` component (Dashboard variant) (`[VISUAL LOOP]` 5px tolerance) (`frontend/tests/visual/HeaderDashboard.spec.ts`)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -88,29 +85,29 @@ description: "Task list template for feature implementation"
 
 ## Phase 4: User Story 2 - Manage Financial Institution Connections (Priority: P2)
 
-**Goal**: A user needs to connect their financial institution accounts to the utility.
+**Goal**: A user can connect their financial institution accounts to the utility, manage existing connections, and view their status.
 
-**Independent Test**: Can be fully tested by navigating to the Connections page, clicking "Connect" for an institution, and verifying the system initiates an authentication flow and appropriately handles success or failure.
+**Independent Test**: Can be fully tested by navigating to the Connections page, initiating a connection, and verifying the system handles authentication flow and updates connection status correctly, including UI/UX fidelity (with 5px layout tolerance).
 
 ### Implementation for User Story 2
 
-- [X] T031 [US2] Implement `GET /institutions` endpoint logic in `backend/app/main.py` based on `contracts/openapi.yaml` to retrieve institution data.
-- [X] T032 [US2] Implement `POST /snaptrade/connect` endpoint logic in `backend/app/main.py` based on `contracts/openapi.yaml` to initiate SnapTrade connection flow.
-- [X] T033 [US2] Implement `POST /snaptrade/callback` endpoint logic in `backend/app/main.py` based on `contracts/openapi.yaml` to handle SnapTrade callback.
-- [X] T034 [US2] Implement service logic for managing institutions and SnapTrade integration (e.g., calling SnapTrade API, updating institution status) in `backend/app/services/institution_service.py`.
-- [X] T035 [US2] Add unit tests for institution service and SnapTrade integration logic in `backend/tests/test_connections.py`. (SKIPPED - Potential Loop)
-- [X] T036 [US2] Implement main `ConnectionsPage` component structure and routing in `frontend/src/pages/ConnectionsPage.tsx` based on `specs/002-account-reporting-utility/screens/connection_tab/screen.png` and `specs/002-account-reporting-utility/screens/connection_tab/code.html`.
-- [X] T037 [US2] Update `Header` component for Connections page (with "Notifications", "Help" icons, user avatar) in `frontend/src/components/Header.tsx` based on `specs/002-account-reporting-utility/screens/connection_tab/screen.png` and `specs/002-account-reporting-utility/screens/connection_tab/code.html`.
-- [X] T038 [US2] Update `SideNav` component (with Connections link active) in `frontend/src/components/SideNav.tsx` based on `specs/002-account-reporting-utility/screens/connection_tab/screen.png` and `specs/002-account-reporting-utility/screens/connection_tab/code.html`.
-- [X] T039 [P] [US2] Implement `ConnectionCard` component to display institution logo, name, status, and "more_vert" menu in `frontend/src/components/ConnectionCard.tsx` based on `specs/002-account-reporting-utility/screens/connection_tab/screen.png` and `specs/002-account-reporting-utility/screens/connection_tab/code.html`.
-- [X] T040 [US2] Implement "Add New Connection" button and search bar in `frontend/src/pages/ConnectionsPage.tsx` based on `specs/002-account-reporting-utility/screens/connection_tab/screen.png` and `specs/002-account-reporting-utility/screens/connection_tab/code.html`.
-- [X] T041 [US2] Integrate `ConnectionCard` components into `ConnectionsPage` in `frontend/src/pages/ConnectionsPage.tsx`.
-- [X] T042 [US2] Implement API service client functions to call `GET /institutions`, `POST /snaptrade/connect`, and `POST /snaptrade/callback` in `frontend/src/services/api.ts`.
-- [X] T043 [US2] Implement data fetching and state management for `ConnectionsPage` in `frontend/src/pages/ConnectionsPage.tsx`, including sorting institutions.
-- [X] T044 [US2] Integrate SnapTrade React SDK for connection flow in `frontend/src/snaptrade-sdk/SnapTradeLink.tsx`.
-- [X] T045 [US2] Implement handling of connection success/failure and display of status messages/error messages in `frontend/src/pages/ConnectionsPage.tsx` and `frontend/src/components/ConnectionCard.tsx`.
-- [X] T046 [US2] Implement `Notification` component to display user messages (e.g., connection success/failure) in `frontend/src/components/Notification.tsx`.
-- [X] T047 [US2] Implement `NotificationContext` for managing and displaying notifications in `frontend/src/context/NotificationContext.tsx`.
+- [ ] T028 [US2] Create backend service for managing institution connections (`backend/app/services/institution_service.py`)
+- [ ] T029 [US2] Implement backend API endpoints for fetching institutions and managing connection status (`backend/app/routers/institutions.py`)
+- [ ] T030 [P] [US2] Implement frontend API service for institution data and connection management (`frontend/src/services/api.ts`)
+- [ ] T031 [P] [US2] Create frontend `ConnectionCard` component (institution logo, name, status, `more_vert` menu) (`frontend/src/components/ConnectionCard.tsx`)
+- [ ] T032 [P] [US2] Create Playwright visual regression test for `ConnectionCard` component (`[VISUAL LOOP]` 5px tolerance) covering different connection states (`frontend/tests/visual/ConnectionCard.spec.ts`)
+- [ ] T033 [P] [US2] Implement `SideNav` component (Dashboard, Connections, Settings, Logout links) (`frontend/src/components/SideNav.tsx`)
+- [ ] T034 [P] [US2] Create Playwright visual regression test for `SideNav` component (`[VISUAL LOOP]` 5px tolerance) covering active states (`frontend/tests/visual/SideNav.spec.ts`)
+- [ ] T035 [P] [US2] Create frontend `Notification` component (`frontend/src/components/Notification.tsx`, `frontend/src/context/NotificationContext.tsx`)
+- [ ] T036 [P] [US2] Create Playwright visual regression test for `Notification` component (`[VISUAL LOOP]` 5px tolerance) (`frontend/tests/visual/Notification.spec.ts`)
+- [ ] T037 [US2] Implement `ConnectionsPage` assembling `ConnectionCard`s, "Add New Connection" button, search bar, and integrating API calls (`frontend/src/pages/ConnectionsPage.tsx`)
+- [ ] T038 [US2] Create Playwright visual regression test for `ConnectionsPage` (`[VISUAL LOOP]` 5px tolerance) covering list display, search, and connection states (`frontend/tests/visual/ConnectionsPage.spec.ts`)
+- [ ] T039 [P] [US2] Implement the "Add New Connection" button functionality, initiating the secure authentication flow via SnapTrade SDK (`frontend/src/pages/ConnectionsPage.tsx`)
+- [ ] T040 [P] [US2] Implement the search bar functionality to filter institutions in real-time (`frontend/src/pages/ConnectionsPage.tsx`)
+- [ ] T041 [P] [US2] Implement sorting logic for institutions on Connections page (connected first, then alphabetical) (`backend/app/services/institution_service.py` or `frontend/src/pages/ConnectionsPage.tsx`)
+- [ ] T042 [P] [US2] Implement `Header` component for Connections page (title, notifications, help, avatar) (`frontend/src/components/Header.tsx`)
+- [ ] T043 [P] [US2] Create Playwright visual regression test for `Header` component (Connections variant) (`[VISUAL LOOP]` 5px tolerance) (`frontend/tests/visual/HeaderConnections.spec.ts`)
+- [ ] T044 [P] [US2] Integrate SnapTrade React SDK for connection flows (`frontend/src/snaptrade-sdk/SnapTradeLink.tsx`, `frontend/src/snaptrade-sdk/useSnapTrade.ts`)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -120,14 +117,11 @@ description: "Task list template for feature implementation"
 
 **Goal**: The system prioritizes minimizing the cost of API calls for data retrieval, opting for free services whenever possible.
 
-**Independent Test**: Can be verified by reviewing the system's integration configuration to ensure it prioritizes free or low-cost data sources.
+**Independent Test**: Can be verified by reviewing the system's integration configuration to ensure it prioritizes free or low-cost data sources, and by monitoring API usage.
 
 ### Implementation for User Story 3
 
-- [X] T048 [US3] Implement an in-memory caching mechanism for SnapTrade API responses in `backend/app/cache.py`.
-- [X] T049 [US3] Integrate caching into the service layer in `backend/app/services/dashboard_service.py` and `backend/app/services/institution_service.py`.
-- [X] T050 [US3] Configure cache expiry policies in `backend/app/config.py`.
-- [ ] T051 [US3] Add unit tests for the caching mechanism in `backend/tests/test_cache.py`.
+- [ ] T045 [US3] Implement logic in backend services to prioritize cost-effective API calls for data retrieval (`backend/app/services/dashboard_service.py`, `backend/app/services/institution_service.py`)
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -137,20 +131,15 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [X] T052 [P] Implement input validation and output sanitization for all API endpoints (`backend/app/main.py`, `backend/app/schemas.py`).
-- [X] T053 [P] Review and enhance error handling mechanisms across the backend.
-- [X] T054 [P] Ensure all sensitive data are handled securely via environment variables (`backend/app/config.py`).
-- [X] T055 [P] Implement TLS 1.2+ for all in-transit data (server configuration).
-- [X] T056 [P] Ensure data at rest within the database is encrypted (database configuration).
-- [X] T057 [P] Review and apply best practices for frontend security (e.g., Content Security Policy headers in `vite.config.ts`).
-- [ ] T058 [P] Add unit tests for utility functions, helpers, and complex logic.
-- [ ] T059 [P] Perform comprehensive integration testing across all user stories.
-- [X] T060 [P] Optimize frontend performance.
-- [X] T061 [P] Ensure UI adheres to "pixel-perfect" match as specified in `spec.md`.
-- [X] T062 [P] Update `README.md` files for both frontend and backend with clear setup and run instructions.
-- [X] T063 [P] Validate that the application correctly handles edge cases identified in `spec.md`.
-- [X] T064 [P] Ensure all displayed dates are in `YYYY-MM-DD` format (frontend and backend).
-- [X] T065 [P] Verify 'Refresh Data' button on dashboard is disabled if no institutions are connected (`frontend/src/pages/DashboardPage.tsx`).
+- [ ] T046 Implement robust error handling for all API endpoints and frontend interactions
+- [ ] T047 Enhance logging for all critical operations and errors across backend and frontend (`backend/app/logging_config.py`, `frontend/src/utils/logging.ts`)
+- [ ] T048 [P] Code cleanup and refactoring for all components and services
+- [ ] T049 [P] Ensure all frontend `npm run build` passes without errors as a "Definition of Done" criteria
+- [ ] T050 Review and update documentation (`README.md`, `quickstart.md`)
+- [ ] T051 Implement data encryption in transit (TLS 1.2+) for all communications (Verification of system configuration)
+- [ ] T052 Implement data encryption at rest for sensitive data in SQLite (`backend/app/database.py`)
+- [ ] T053 Conduct end-to-end testing for critical user journeys (Dashboard view, Connection flow)
+- [ ] T054 Final verification of `quickstart.md` to ensure it's up-to-date and executable
 
 ---
 
@@ -194,12 +183,22 @@ description: "Task list template for feature implementation"
 
 ```bash
 # Launch all tests for User Story 1 together (if tests requested):
-Task: "Add unit tests for dashboard service logic in backend/tests/test_dashboard.py"
+Task: "Create Playwright visual regression test for StatCard component ([VISUAL LOOP] 5px tolerance) (frontend/tests/visual/StatCard.spec.ts)"
+Task: "Create Playwright visual regression test for ReportTable component ([VISUAL LOOP] 5px tolerance) (frontend/tests/visual/ReportTable.spec.ts)"
+Task: "Create Playwright visual regression test for DashboardFilterPanel component ([VISUAL LOOP] 5px tolerance) (frontend/tests/visual/DashboardFilterPanel.spec.ts)"
+Task: "Create Playwright visual regression test for SkeletonLoader component ([VISUAL LOOP] 5px tolerance) (frontend/tests/visual/SkeletonLoader.spec.ts)"
+Task: "Create Playwright visual regression test for DashboardPage ([VISUAL LOOP] 5px tolerance) covering empty state, loading state, and data display (frontend/tests/visual/DashboardPage.spec.ts)"
+Task: "Create Playwright visual regression test for Header component (Dashboard variant) ([VISUAL LOOP]` 5px tolerance) (frontend/tests/visual/HeaderDashboard.spec.ts)"
 
-# Launch all frontend components for User Story 1 that are marked as parallel:
-Task: "Implement DashboardFilterPanel component (with "As of Date" picker) in frontend/src/components/DashboardFilterPanel.tsx"
-Task: "Implement StatCard component for high-level metrics (Grand Total, Total Institutions) in frontend/src/components/StatCard.tsx"
-Task: "Implement ReportTable component to display institution-specific data and individual accounts in frontend/src/components/ReportTable.tsx"
+# Launch all frontend API services for User Story 1 together:
+Task: "Implement frontend API service for dashboard data (frontend/src/services/api.ts)"
+
+# Launch all components for User Story 1 together (after API service is ready):
+Task: "Create frontend StatCard component (frontend/src/components/StatCard.tsx)"
+Task: "Create frontend ReportTable component (frontend/src/components/ReportTable.tsx)"
+Task: "Create frontend DashboardFilterPanel component (as-of date picker, institutions checkboxes - *initially hidden/post-MVP for institutions*) (frontend/src/components/DashboardFilterPanel.tsx)"
+Task: "Create frontend SkeletonLoader component for dashboard data (frontend/src/components/SkeletonLoader.tsx)"
+Task: "Implement Header component for Dashboard page (title, export, refresh, avatar) (frontend/src/components/Header.tsx)"
 ```
 
 ---

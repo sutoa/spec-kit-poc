@@ -1,19 +1,31 @@
+// frontend/src/components/StatCard.tsx
+
 import React from 'react';
 
 interface StatCardProps {
   title: string;
-  value: string | number;
-  description: string;
+  value: string;
+  description?: string;
 }
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, description }) => {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5 flex-1 min-w-[200px]">
-      <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</div>
-      <div className="mt-1 text-3xl font-bold text-gray-900 dark:text-white">{value}</div>
-      <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">{description}</div>
+    <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 sm:p-6 xl:p-8">
+      <div className="flex items-center">
+        <div className="flex-shrink-0">
+          <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900 dark:text-white">
+            {value}
+          </span>
+          <h3 className="text-base font-normal text-gray-500 dark:text-gray-400">
+            {title}
+          </h3>
+        </div>
+      </div>
+      {description && (
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{description}</p>
+      )}
     </div>
   );
 };
 
-export default React.memo(StatCard);
+export default StatCard;

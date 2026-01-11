@@ -1,103 +1,194 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Header from '../components/Header';
-import DashboardFilterPanel from '../components/DashboardFilterPanel';
+// frontend/src/pages/DashboardPage.tsx
+
+import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
+
 import StatCard from '../components/StatCard';
+
 import ReportTable from '../components/ReportTable';
-import SkeletonLoader from '../components/SkeletonLoader'; // Assuming this component exists
-import { DashboardResponse } from '../types/dashboard';
-import { getDashboardData } from '../services/api'; // Assuming this function exists
+
+import DashboardFilterPanel from '../components/DashboardFilterPanel';
+
+// import SkeletonLoader from '../components/SkeletonLoader'; // T020
+
+
 
 const DashboardPage: React.FC = () => {
-  const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null);
+
+  const [report, setReport] = useState<DashboardReport | null>(null);
+
   const [loading, setLoading] = useState<boolean>(true);
-  const [asOfDate, setAsOfDate] = useState<Date | undefined>(undefined);
+
   const [error, setError] = useState<string | null>(null);
 
-  const loadDashboardData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const formattedDate = asOfDate ? asOfDate.toISOString().split('T')[0] : undefined;
-      const data = await getDashboardData(formattedDate);
-      setDashboardData(data);
-    } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
-      setError('Failed to load dashboard data. Please try again.');
-      setDashboardData(null); // Clear data on error
-    } finally {
-      setLoading(false);
-    }
-  }, [asOfDate]);
+  const [asOfDate, setAsOfDate] = useState<string | undefined>(undefined); // For filter
+
+  const [selectedFilterDate, setSelectedFilterDate] = useState<Date | undefined>(undefined);
+
+
 
   useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
 
-  const handleDateChange = (date: Date | undefined) => {
-    setAsOfDate(date);
+    fetchDashboardReport();
+
+  }, [asOfDate]);
+
+
+
+  const fetchDashboardReport = async () => {
+
+    setLoading(true);
+
+    setError(null);
+
+    try {
+
+      const data = await getDashboardData(asOfDate);
+
+      setReport(data);
+
+    } catch (err) {
+
+      console.error("Failed to fetch dashboard report:", err);
+
+      setError("Failed to load dashboard data. Please try again later.");
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
   };
 
-  const totalInstitutions = dashboardData?.institutions.length || 0;
-  const grandTotal = dashboardData?.grand_total || 0;
 
-  const showEmptyState = !loading && (!dashboardData || totalInstitutions === 0);
+
+  if (loading) {
+
+    // return <SkeletonLoader />; // T020
+
+    return (
+
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+
+        Loading Dashboard...
+
+      </div>
+
+    );
+
+  }
+
+
+
+  if (error) {
+
+    return (
+
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-red-500">
+
+        Error: {error}
+
+      </div>
+
+    );
+
+  }
+
+
+
+  if (!report || report.institution_groups.length === 0) {
+
+    return (
+
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+
+        <h2 className="text-xl font-semibold mb-4">No Institutions Connected</h2>
+
+        <p className="text-gray-400 text-center">
+
+          It looks like you haven't connected any financial institutions yet.
+
+          Go to the <span className="font-bold text-blue-400">Connections</span> page to get started!
+
+        </p>
+
+      </div>
+
+    );
+
+  }
+
+
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      <Header
-        title="Consolidated Account Report"
-        showRefreshButton={true}
-        onRefreshClick={loadDashboardData}
-        disableRefresh={loading || totalInstitutions === 0}
-      />
-      <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900 p-6">
-        <div className="container mx-auto px-6 py-8">
-          <div className="lg:flex gap-6">
-            <DashboardFilterPanel onFilterChange={handleDateChange} currentAsOfDate={asOfDate} />
 
-            <div className="flex-1 mt-6 lg:mt-0">
-              {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                  <strong className="font-bold">Error:</strong>
-                  <span className="block sm:inline"> {error}</span>
-                </div>
-              )}
+    <div className="flex-1 flex flex-col lg:flex-row bg-background-light dark:bg-background-dark">
 
-              {showEmptyState ? (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5 text-center text-gray-500 dark:text-gray-400">
-                  <p className="text-xl font-semibold mb-2">No Connected Institutions</p>
-                  <p>Please go to the Connections page to add your financial institutions.</p>
-                  {/* Potentially add a link/button to Connections page */}
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {loading ? (
-                      <>
-                        <SkeletonLoader className="h-32" />
-                        <SkeletonLoader className="h-32" />
-                      </>
-                    ) : (
-                      <>
-                        <StatCard title="Grand Total" value={`$${grandTotal.toFixed(2)}`} description="Total across all connected accounts" />
-                        <StatCard title="Total Institutions" value={totalInstitutions} description="Number of connected financial institutions" />
-                      </>
-                    )}
-                  </div>
+      {/* Filters Panel */}
 
-                  {loading ? (
-                    <SkeletonLoader className="h-96" />
-                  ) : (
-                    <ReportTable institutions={dashboardData?.institutions || []} />
-                  )}
-                </>
-              )}
-            </div>
+      <aside className="w-full lg:w-80 flex-shrink-0 bg-panel-light dark:bg-panel-dark border-r border-border-light dark:border-border-dark flex flex-col p-6">
+
+        <h1 className="text-text-primary-light dark:text-text-primary-dark text-base font-medium leading-normal">Filters</h1>
+
+        <DashboardFilterPanel
+
+          onFilterChange={setSelectedFilterDate}
+
+          currentAsOfDate={selectedFilterDate}
+
+        />
+
+        {/* Placeholder for institution checkboxes - will integrate later */}
+
+        <button
+
+          onClick={() => setAsOfDate(selectedFilterDate ? format(selectedFilterDate, 'yyyy-MM-dd') : undefined)}
+
+          className="w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] mt-auto"
+
+        >
+
+          <span className="truncate">Apply Filters</span>
+
+        </button>
+
+      </aside>
+
+
+
+      {/* Report Section */}
+
+      <section className="flex-1 bg-background-light dark:bg-background-dark p-8 overflow-y-auto">
+
+        <div className="max-w-4xl mx-auto flex flex-col gap-6">
+
+          {/* Stat Cards */}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <StatCard title="Grand Total" value={`${report.grand_total.toFixed(2)}`} />
+
+            <StatCard title="Total Institutions" value={String(report.institution_groups.length)} />
+
           </div>
+
+
+
+          {/* Report Table */}
+
+          <ReportTable institutions={report.institution_groups} />
+
         </div>
-      </main>
+
+      </section>
+
     </div>
+
   );
+
 };
+
+
 
 export default DashboardPage;

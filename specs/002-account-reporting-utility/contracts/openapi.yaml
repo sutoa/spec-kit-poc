@@ -1,142 +1,195 @@
 openapi: 3.0.0
 info:
-  title: Account Reporting API
+  title: Account Reporting Utility API
   version: 1.0.0
+  description: API for managing financial institution connections and viewing consolidated account reports.
+
+servers:
+  - url: http://localhost:8000
+    description: Local Development Server
+
+tags:
+  - name: Dashboard
+    description: Operations related to the consolidated account dashboard
+  - name: Institutions
+    description: Operations related to financial institutions and connections
+
 paths:
-  /institutions:
+  /dashboard:
     get:
-      summary: Get all institutions
+      summary: Get consolidated account report
+      description: Retrieves a consolidated report of financial accounts, optionally filtered by an "as-of date".
+      tags:
+        - Dashboard
+      parameters:
+        - in: query
+          name: as_of_date
+          schema:
+            type: string
+            format: date
+          required: false
+          description: Optional date to filter the report (YYYY-MM-DD). If not provided, returns the latest available data.
       responses:
         '200':
-          description: A list of institutions
+          description: Consolidated account report successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardReport'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /institutions:
+    get:
+      summary: Get list of financial institutions
+      description: Retrieves a list of all financial institutions with their current connection status, sorted alphabetically.
+      tags:
+        - Institutions
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          required: false
+          description: Optional search term to filter institutions by name.
+      responses:
+        '200':
+          description: List of institutions successfully retrieved.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Institution'
-  /institutions/{id}/connect:
-    post:
-      summary: Initiate a connection to an institution
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Connection initiated
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  redirect_uri:
-                    type: string
-  /dashboard:
-    get:
-      summary: Get dashboard data
+                $ref: '#/components/schemas/Error'
+
+  /institutions/{institution_id}/connect:
+    post:
+      summary: Initiate connection to a financial institution
+      description: Initiates the secure authentication flow for a specified financial institution.
+      tags:
+        - Institutions
       parameters:
-        - name: as_of_date
-          in: query
+        - in: path
+          name: institution_id
           schema:
             type: string
-            format: date
+          required: true
+          description: The external ID of the institution to connect to.
       responses:
         '200':
-          description: Dashboard data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Dashboard'
-  /snaptrade/connect:
-    post:
-      summary: Get a redirect URI for SnapTrade connection
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                institution_id:
-                  type: string
-      responses:
-        '200':
-          description: SnapTrade connection redirect URI
+          description: Connection flow initiated successfully.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  redirect_uri:
+                  redirect_url:
                     type: string
-  /snaptrade/callback:
-    post:
-      summary: Handle SnapTrade callback
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                public_token:
-                  type: string
-      responses:
-        '200':
-          description: SnapTrade callback handled
+                    description: URL to redirect the user for authentication with the third-party aggregator.
+        '400':
+          description: Invalid institution ID or connection already active.
+        '500':
+          description: Internal Server Error or issue initiating connection.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
-    Institution:
-      type: object
-      properties:
-        id:
-          type: integer
-        external_id:
-          type: string
-        name:
-          type: string
-        status:
-          type: string
-          enum: [connected, disconnected, error, pending]
     Account:
       type: object
       properties:
-        id:
-          type: integer
         external_id:
           type: string
+          description: Unique identifier for the account from the external API.
         masked_account_number:
           type: string
+          description: Partially obscured account number (e.g., "••••1234").
         balance:
           type: number
+          format: float
+          description: Current balance of the account in USD.
         as_of_date:
           type: string
           format: date
-    Dashboard:
+          description: Date the balance was valid (YYYY-MM-DD).
+      required:
+        - external_id
+        - masked_account_number
+        - balance
+        - as_of_date
+
+    Institution:
       type: object
       properties:
-        grand_total:
-          type: number
-        institutions:
+        external_id:
+          type: string
+          description: Unique identifier for the institution from the external API.
+        name:
+          type: string
+          description: Name of the financial institution.
+        connection_status:
+          type: string
+          enum: [connected, disconnected, error, pending]
+          description: Current status of the connection to the institution.
+      required:
+        - external_id
+        - name
+        - connection_status
+
+    InstitutionGroup:
+      type: object
+      properties:
+        institution:
+          $ref: '#/components/schemas/Institution'
+        accounts:
           type: array
           items:
-            type: object
-            properties:
-              institution:
-                $ref: '#/components/schemas/Institution'
-              accounts:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Account'
-              sub_total:
-                type: number
+            $ref: '#/components/schemas/Account'
+        sub_total:
+          type: number
+          format: float
+          description: Sum of balances for all accounts in this institution.
+      required:
+        - institution
+        - accounts
+        - sub_total
+
+    DashboardReport:
+      type: object
+      properties:
+        institution_groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstitutionGroup'
+        grand_total:
+          type: number
+          format: float
+          description: Sum of balances for all accounts across all institutions.
+      required:
+        - institution_groups
+        - grand_total
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: A unique error code.
+        message:
+          type: string
+          description: A human-readable error message.
+      required:
+        - code
+        - message

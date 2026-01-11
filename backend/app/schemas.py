@@ -1,44 +1,58 @@
-from pydantic import BaseModel, ConfigDict, field_validator
+from typing import List, Optional
 from datetime import date
-from typing import Optional, List
+from pydantic import BaseModel, Field
+
+# Shared Schemas
+
+class AccountBase(BaseModel):
+    external_id: str = Field(..., example="snaptrade-acc-123")
+    masked_account_number: str = Field(..., example="••••1234")
+    balance: float = Field(..., example=1000.00)
+    as_of_date: date = Field(..., example="2025-12-21")
+
+class AccountCreate(AccountBase):
+    institution_id: int = Field(..., example=1) # Internal DB ID
+
+class Account(AccountBase):
+    id: int = Field(..., example=1)
+    institution_id: int = Field(..., example=1)
+
+    class Config:
+        from_attributes = True # Formerly orm_mode = True
 
 class InstitutionBase(BaseModel):
-    external_id: str
-    name: str
+    external_id: str = Field(..., example="snaptrade-inst-456")
+    name: str = Field(..., example="My Bank")
+    # In data-model.md, connection_status is an Enum. For backend, we store as string.
+    status: str = Field(..., example="connected") 
 
 class InstitutionCreate(InstitutionBase):
     pass
 
 class Institution(InstitutionBase):
-    id: int
-    model_config = ConfigDict(from_attributes=True)
+    id: int = Field(..., example=1)
+    
+    class Config:
+        from_attributes = True # Formerly orm_mode = True
 
-class AccountBase(BaseModel):
-    external_id: str
-    masked_account_number: str
-    balance: float
-    as_of_date: date
+# Schemas for API responses (potentially including relationships)
 
-    @field_validator('balance')
-    def balance_must_be_positive(cls, v):
-        if v < 0:
-            raise ValueError('balance must be positive')
-        return v
+class AccountWithInstitution(Account):
+    institution: Optional[Institution] = None
 
-class AccountCreate(AccountBase):
-    institution_id: int
+class InstitutionWithAccounts(Institution):
+    accounts: List[Account] = []
 
-class Account(AccountBase):
-    id: int
-    institution_id: int
+    class Config:
+        from_attributes = True
 
-    model_config = ConfigDict(from_attributes=True)
+# Dashboard specific schemas (from openapi.yaml)
 
-class DashboardInstitution(BaseModel):
+class InstitutionGroup(BaseModel):
     institution: Institution
     accounts: List[Account]
-    sub_total: float
+    sub_total: float = Field(..., example=1500.00)
 
-class DashboardResponse(BaseModel):
-    grand_total: float
-    institutions: List[DashboardInstitution]
+class DashboardReport(BaseModel):
+    institution_groups: List[InstitutionGroup]
+    grand_total: float = Field(..., example=2500.00)

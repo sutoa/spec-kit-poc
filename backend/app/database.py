@@ -9,6 +9,10 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+# Function to create all tables
+def create_db_and_tables():
+    Base.metadata.create_all(engine)
+
 # Dependency to get the DB session
 def get_db():
     db = SessionLocal()

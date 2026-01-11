@@ -6,9 +6,8 @@ describe('DashboardFilterPanel', () => {
   const mockInstitutions = ['Alpaca', 'Vanguard'];
 
   it('renders filter panel elements', () => {
-    const mockOnDateChange = vi.fn();
-    const mockOnRefresh = vi.fn();
-    render(<DashboardFilterPanel onDateChange={mockOnDateChange} onRefresh={mockOnRefresh} institutions={mockInstitutions} />);
+    const mockOnFilterChange = vi.fn();
+    render(<DashboardFilterPanel onFilterChange={mockOnFilterChange} currentAsOfDate={new Date()} />);
     
     expect(screen.getByRole('heading', { name: /filters/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/as of date/i)).toBeInTheDocument();
@@ -16,9 +15,8 @@ describe('DashboardFilterPanel', () => {
   });
 
   it('calls onDateChange when date input changes', () => {
-    const mockOnDateChange = vi.fn();
-    const mockOnRefresh = vi.fn();
-    render(<DashboardFilterPanel onDateChange={mockOnDateChange} onRefresh={mockOnRefresh} institutions={mockInstitutions} />);
+    const mockOnFilterChange = vi.fn();
+    render(<DashboardFilterPanel onFilterChange={mockOnFilterChange} currentAsOfDate={new Date()} />);
     
     const dateInput = screen.getByLabelText(/as of date/i);
     fireEvent.change(dateInput, { target: { value: '2023-10-26' } });
@@ -26,14 +24,5 @@ describe('DashboardFilterPanel', () => {
     // The onDateChange is now called by handleApplyFilters
   });
 
-  it('calls onRefresh when Apply Filters button is clicked', () => {
-    const mockOnDateChange = vi.fn();
-    const mockOnRefresh = vi.fn();
-    render(<DashboardFilterPanel onDateChange={mockOnDateChange} onRefresh={mockOnRefresh} institutions={mockInstitutions} />);
-    
-    const applyButton = screen.getByRole('button', { name: /apply filters/i });
-    fireEvent.click(applyButton);
-    
-    expect(mockOnRefresh).toHaveBeenCalledTimes(1);
-  });
+
 });

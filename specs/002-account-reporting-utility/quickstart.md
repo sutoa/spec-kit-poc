@@ -1,59 +1,67 @@
-# Quickstart
+# Quickstart Guide: Account Reporting Utility
 
-This document provides instructions on how to set up and run the Account Reporting Utility.
+This guide provides instructions to quickly set up and run the Account Reporting Utility locally.
 
 ## Prerequisites
 
 -   Python 3.11+
--   Node.js and npm
+-   Node.js (LTS recommended)
+-   npm (Node Package Manager)
+-   Git
 
-## Backend
+## Setup
 
-1.  **Navigate to the backend directory:**
+1.  **Clone the Repository**:
+    ```bash
+    git clone [repository_url]
+    cd account-viewer
+    ```
+
+2.  **Backend Setup**:
+    Navigate to the `backend/` directory, create a Python virtual environment, install dependencies, and run the FastAPI application.
+
     ```bash
     cd backend
-    ```
-
-2.  **Create a virtual environment:**
-    ```bash
-    python -m venv venv
-    ```
-
-3.  **Activate the virtual environment:**
-    -   On macOS and Linux:
-        ```bash
-        source venv/bin/activate
-        ```
-    -   On Windows:
-        ```bash
-        venv\Scripts\activate
-        ```
-
-4.  **Install the dependencies:**
-    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
     pip install -r requirements.txt
-    ```
-
-5.  **Run the application:**
-    ```bash
     uvicorn app.main:app --reload
     ```
-    The backend will be running at `http://127.0.0.1:8000`.
+    The backend server will typically run on `http://localhost:8000`.
 
-## Frontend
+3.  **Frontend Setup**:
+    Open a new terminal, navigate to the `frontend/` directory, install Node.js dependencies, and start the React development server.
 
-1.  **Navigate to the frontend directory:**
     ```bash
     cd frontend
-    ```
-
-2.  **Install the dependencies:**
-    ```bash
     npm install
-    ```
-
-3.  **Run the application:**
-    ```bash
     npm run dev
     ```
-    The frontend will be running at `http://localhost:5173` (or another port if 5173 is in use).
+    The frontend application will typically run on `http://localhost:5173`.
+
+## Accessing the Application
+
+-   Once both the backend and frontend servers are running, open your web browser and navigate to `http://localhost:5173`.
+-   The application will be accessible, allowing you to view the dashboard and manage connections.
+
+## Running Tests
+
+### Backend Tests (Python)
+```bash
+cd backend
+pytest
+```
+
+### Frontend Tests (TypeScript/React)
+```bash
+cd frontend
+npm test # For Vitest unit tests
+npx playwright test # For Playwright visual regression tests
+```
+
+## Important Notes
+
+-   The application uses an in-memory SQLite database for local development. Data will not persist across restarts unless explicitly configured.
+-   Ensure both backend and frontend servers are running simultaneously for full application functionality.
+-   For connecting to financial institutions, the application integrates with SnapTrade. You will need to interact with their authentication flow.
+-   The current MVP is designed for desktop web browsers only.

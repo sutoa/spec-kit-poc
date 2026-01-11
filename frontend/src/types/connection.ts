@@ -1,9 +1,10 @@
-export type ConnectionStatus = 'connected' | 'disconnected' | 'error' | 'pending';
+// frontend/src/types/connection.ts
+
+export type InstitutionStatus = 'connected' | 'disconnected' | 'error' | 'pending';
 
 export interface Institution {
   id: number;
   external_id: string;
   name: string;
-  status: ConnectionStatus;
-  logoUrl?: string; // Optional as it might not always be available
+  status: InstitutionStatus; // Maps to backend's string status
 }
