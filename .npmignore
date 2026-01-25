@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.env*
+.prettierrc
+.eslintrc.js
+tsconfig.json
+vite.config.ts
+pnpm-workspace.yaml
+README.md

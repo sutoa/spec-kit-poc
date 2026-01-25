@@ -123,29 +123,29 @@
 
 ### Tests for User Story 2
 
-- [X] T042 [P] [US2] Contract test for POST /connections in backend/tests/integration/connections.test.ts
-- [X] T043 [P] [US2] Contract test for DELETE /connections/:id in backend/tests/integration/connections.test.ts
-- [X] T044 [P] [US2] Unit test for InstitutionList component in frontend/tests/unit/InstitutionList.test.tsx
+- [ ] T042 [P] [US2] Contract test for POST /connections in backend/tests/integration/connections.test.ts
+- [ ] T043 [P] [US2] Contract test for DELETE /connections/:id in backend/tests/integration/connections.test.ts
+- [ ] T044 [P] [US2] Unit test for InstitutionList component in frontend/tests/unit/InstitutionList.test.tsx
 
 ### Backend Implementation for User Story 2
 
-- [X] T045 [US2] Implement GET /institutions endpoint in backend/src/api/institutions.ts
-- [X] T046 [US2] Implement GET /connections endpoint in backend/src/api/connections.ts
-- [X] T047 [US2] Implement POST /connections endpoint (create connection via SnapTrade) in backend/src/api/connections.ts
-- [X] T048 [US2] Implement DELETE /connections/:id endpoint in backend/src/api/connections.ts
-- [X] T049 [US2] Implement POST /connections/:id/sync endpoint in backend/src/api/connections.ts
-- [X] T050 [US2] Create ConnectionService with SnapTrade integration in backend/src/services/connection.ts
+- [ ] T045 [US2] Implement GET /institutions endpoint in backend/src/api/institutions.ts
+- [ ] T046 [US2] Implement GET /connections endpoint in backend/src/api/connections.ts
+- [ ] T047 [US2] Implement POST /connections endpoint (create connection via SnapTrade) in backend/src/api/connections.ts
+- [ ] T048 [US2] Implement DELETE /connections/:id endpoint in backend/src/api/connections.ts
+- [ ] T049 [US2] Implement POST /connections/:id/sync endpoint in backend/src/api/connections.ts
+- [ ] T050 [US2] Create ConnectionService with SnapTrade integration in backend/src/services/connection.ts
 
 ### Frontend Implementation for User Story 2
 
-- [X] T051 [P] [US2] Create InstitutionCard component in frontend/src/components/connections/InstitutionCard.tsx
-- [X] T052 [P] [US2] Create InstitutionList component in frontend/src/components/connections/InstitutionList.tsx
-- [X] T053 [US2] Create ConnectModal component (credential input form) in frontend/src/components/connections/ConnectModal.tsx
-- [X] T054 [US2] Create DisconnectConfirmModal component in frontend/src/components/connections/DisconnectConfirmModal.tsx
-- [X] T055 [US2] Create useInstitutions hook in frontend/src/hooks/useInstitutions.ts
-- [X] T056 [US2] Create useConnections hook in frontend/src/hooks/useConnections.ts
-- [X] T057 [US2] Implement full Connections page in frontend/src/pages/Connections.tsx
-- [X] T058 [US2] Style Connections view pixel-perfect per mockup-screens/connection_tab/code.html
+- [ ] T051 [P] [US2] Create InstitutionCard component in frontend/src/components/connections/InstitutionCard.tsx
+- [ ] T052 [P] [US2] Create InstitutionList component in frontend/src/components/connections/InstitutionList.tsx
+- [ ] T053 [US2] Create ConnectModal component (credential input form) in frontend/src/components/connections/ConnectModal.tsx
+- [ ] T054 [US2] Create DisconnectConfirmModal component in frontend/src/components/connections/DisconnectConfirmModal.tsx
+- [ ] T055 [US2] Create useInstitutions hook in frontend/src/hooks/useInstitutions.ts
+- [ ] T056 [US2] Create useConnections hook in frontend/src/hooks/useConnections.ts
+- [ ] T057 [US2] Implement full Connections page in frontend/src/pages/Connections.tsx
+- [ ] T058 [US2] Style Connections view pixel-perfect per mockup-screens/connection_tab/code.html
 
 **Checkpoint**: Connection management complete - can connect/disconnect institutions
 
@@ -159,32 +159,32 @@
 
 ### Tests for User Story 1
 
-- [X] T059 [P] [US1] Contract test for GET /dashboard in backend/tests/integration/dashboard.test.ts
-- [X] T060 [P] [US1] Contract test for POST /dashboard/refresh in backend/tests/integration/dashboard.test.ts
-- [X] T061 [P] [US1] Unit test for GrandTotal component in frontend/tests/unit/GrandTotal.test.tsx
-- [X] T062 [P] [US1] Unit test for InstitutionCard (dashboard) in frontend/tests/unit/DashboardInstitutionCard.test.tsx
+- [ ] T059 [P] [US1] Contract test for GET /dashboard in backend/tests/integration/dashboard.test.ts
+- [ ] T060 [P] [US1] Contract test for POST /dashboard/refresh in backend/tests/integration/dashboard.test.ts
+- [ ] T061 [P] [US1] Unit test for GrandTotal component in frontend/tests/unit/GrandTotal.test.tsx
+- [ ] T062 [P] [US1] Unit test for InstitutionCard (dashboard) in frontend/tests/unit/DashboardInstitutionCard.test.tsx
 
 ### Backend Implementation for User Story 1
 
-- [X] T063 [US1] Implement GET /dashboard endpoint in backend/src/api/dashboard.ts
-- [X] T064 [US1] Implement POST /dashboard/refresh endpoint in backend/src/api/dashboard.ts
-- [X] T065 [US1] Implement GET /dashboard/export (CSV) endpoint in backend/src/api/dashboard.ts
-- [X] T066 [US1] Create DashboardService with aggregation logic in backend/src/services/dashboard.ts
-- [X] T067 [US1] Create BalanceService for balance queries in backend/src/services/balance.ts
-- [X] T068 [US1] Implement as-of date filtering logic in backend/src/services/dashboard.ts
+- [ ] T063 [US1] Implement GET /dashboard endpoint in backend/src/api/dashboard.ts
+- [ ] T064 [US1] Implement POST /dashboard/refresh endpoint in backend/src/api/dashboard.ts
+- [ ] T065 [US1] Implement GET /dashboard/export (CSV) endpoint in backend/src/api/dashboard.ts
+- [ ] T066 [US1] Create DashboardService with aggregation logic in backend/src/services/dashboard.ts
+- [ ] T067 [US1] Create BalanceService for balance queries in backend/src/services/balance.ts
+- [ ] T068 [US1] Implement as-of date filtering logic in backend/src/services/dashboard.ts
 
 ### Frontend Implementation for User Story 1
 
-- [X] T069 [P] [US1] Create GrandTotal component in frontend/src/components/dashboard/GrandTotal.tsx
-- [X] T070 [P] [US1] Create TotalInstitutions component in frontend/src/components/dashboard/TotalInstitutions.tsx
-- [X] T071 [P] [US1] Create FilterPanel component (as-of date picker) in frontend/src/components/dashboard/FilterPanel.tsx
-- [X] T072 [US1] Create DashboardInstitutionCard component in frontend/src/components/dashboard/InstitutionCard.tsx
-- [X] T073 [US1] Create AccountRow component in frontend/src/components/dashboard/AccountRow.tsx
-- [X] T074 [US1] Create useDashboard hook in frontend/src/hooks/useDashboard.ts
-- [X] T075 [US1] Implement full Dashboard page in frontend/src/pages/Dashboard.tsx
-- [X] T076 [US1] Implement refresh functionality with loading states
-- [X] T077 [US1] Implement export report button functionality
-- [X] T078 [US1] Style Dashboard view pixel-perfect per mockup-screens/dashboard_tab/code.html
+- [ ] T069 [P] [US1] Create GrandTotal component in frontend/src/components/dashboard/GrandTotal.tsx
+- [ ] T070 [P] [US1] Create TotalInstitutions component in frontend/src/components/dashboard/TotalInstitutions.tsx
+- [ ] T071 [P] [US1] Create FilterPanel component (as-of date picker) in frontend/src/components/dashboard/FilterPanel.tsx
+- [ ] T072 [US1] Create DashboardInstitutionCard component in frontend/src/components/dashboard/InstitutionCard.tsx
+- [ ] T073 [US1] Create AccountRow component in frontend/src/components/dashboard/AccountRow.tsx
+- [ ] T074 [US1] Create useDashboard hook in frontend/src/hooks/useDashboard.ts
+- [ ] T075 [US1] Implement full Dashboard page in frontend/src/pages/Dashboard.tsx
+- [ ] T076 [US1] Implement refresh functionality with loading states
+- [ ] T077 [US1] Implement export report button functionality
+- [ ] T078 [US1] Style Dashboard view pixel-perfect per mockup-screens/dashboard_tab/code.html
 
 **Checkpoint**: Dashboard complete - consolidated view with refresh, grouping, and totals
 
@@ -198,15 +198,15 @@
 
 ### Implementation
 
-- [X] T079 Add SNAPTRADE_USER_ID and SNAPTRADE_USER_SECRET to backend/.env configuration
-- [X] T080 Update ConnectionService.createConnection() in backend/src/services/connection.ts to use fixed user credentials from environment instead of registering new SnapTrade users
-- [X] T081 Update ConnectionService.syncConnection() in backend/src/services/connection.ts to use fixed user credentials from environment
-- [X] T082 Update ConnectionService.deleteConnection() in backend/src/services/connection.ts to NOT delete the SnapTrade user (since it's shared)
-- [X] T083 Update ConnectionService.getConnectionPortalUrl() in backend/src/services/connection.ts to use fixed user credentials from environment
-- [X] T084 Update Connection model schema in backend/src/db/schema.ts to make snaptrade_user_id and snaptrade_user_secret optional (can be null since using fixed user)
-- [X] T085 Update ConnectionModel in backend/src/models/connection.ts to handle optional SnapTrade credentials
-- [X] T086 Remove registerSnaptradeUser calls from connection creation flow
-- [X] T087 Test fixed user flow: create connection, complete OAuth, sync accounts, verify dashboard shows data
+- [ ] T079 Add SNAPTRADE_USER_ID and SNAPTRADE_USER_SECRET to backend/.env configuration
+- [ ] T080 Update ConnectionService.createConnection() in backend/src/services/connection.ts to use fixed user credentials from environment instead of registering new SnapTrade users
+- [ ] T081 Update ConnectionService.syncConnection() in backend/src/services/connection.ts to use fixed user credentials from environment
+- [ ] T082 Update ConnectionService.deleteConnection() in backend/src/services/connection.ts to NOT delete the SnapTrade user (since it's shared)
+- [ ] T083 Update ConnectionService.getConnectionPortalUrl() in backend/src/services/connection.ts to use fixed user credentials from environment
+- [ ] T084 Update Connection model schema in backend/src/db/schema.ts to make snaptrade_user_id and snaptrade_user_secret optional (can be null since using fixed user)
+- [ ] T085 Update ConnectionModel in backend/src/models/connection.ts to handle optional SnapTrade credentials
+- [ ] T086 Remove registerSnaptradeUser calls from connection creation flow
+- [ ] T087 Test fixed user flow: create connection, complete OAuth, sync accounts, verify dashboard shows data
 
 **Checkpoint**: All connections use a single fixed SnapTrade user for MVP simplicity
 
@@ -222,25 +222,25 @@
 
 ### Backend Implementation for Add New Connections
 
-- [X] T109 [P] [US2] Create Brokerage type in backend/src/types/index.ts with id, name, slug, isConnected fields
-- [X] T110 [US2] Create GET /api/brokerages endpoint in backend/src/api/brokerages.ts that calls listBrokerages() and marks connected ones
-- [X] T111 [US2] Register brokerages router in backend/src/api/index.ts
-- [X] T112 [US2] Update POST /connections/:id/portal-url endpoint to accept broker query param in backend/src/api/connections.ts
+- [ ] T109 [P] [US2] Create Brokerage type in backend/src/types/index.ts with id, name, slug, isConnected fields
+- [ ] T110 [US2] Create GET /api/brokerages endpoint in backend/src/api/brokerages.ts that calls listBrokerages() and marks connected ones
+- [ ] T111 [US2] Register brokerages router in backend/src/api/index.ts
+- [ ] T112 [US2] Update POST /connections/:id/portal-url endpoint to accept broker query param in backend/src/api/connections.ts
 
 ### Frontend Implementation for Add New Connections
 
-- [X] T113 [P] [US2] Create Brokerage type in frontend/src/types/index.ts
-- [X] T114 [P] [US2] Add getBrokerages() function to frontend/src/services/api.ts
-- [X] T115 [US2] Create useBrokerages hook with React Query in frontend/src/hooks/useBrokerages.ts
-- [X] T116 [US2] Create AddInstitutionModal component with search in frontend/src/components/connections/AddInstitutionModal.tsx
-- [X] T117 [US2] Update Connections page to add "Add Institution" button and wire up modal in frontend/src/pages/Connections.tsx
-- [X] T118 [US2] Update ConnectModal to accept broker slug and pass to portal URL in frontend/src/components/connections/ConnectModal.tsx
-- [X] T119 [US2] Update getPortalUrl API call to include broker param in frontend/src/services/api.ts
+- [ ] T113 [P] [US2] Create Brokerage type in frontend/src/types/index.ts
+- [ ] T114 [P] [US2] Add getBrokerages() function to frontend/src/services/api.ts
+- [ ] T115 [US2] Create useBrokerages hook with React Query in frontend/src/hooks/useBrokerages.ts
+- [ ] T116 [US2] Create AddInstitutionModal component with search in frontend/src/components/connections/AddInstitutionModal.tsx
+- [ ] T117 [US2] Update Connections page to add "Add Institution" button and wire up modal in frontend/src/pages/Connections.tsx
+- [ ] T118 [US2] Update ConnectModal to accept broker slug and pass to portal URL in frontend/src/components/connections/ConnectModal.tsx
+- [ ] T119 [US2] Update getPortalUrl API call to include broker param in frontend/src/services/api.ts
 
 ### Testing for Add New Connections
 
-- [X] T120 [P] [US2] Unit test for AddInstitutionModal component in frontend/tests/unit/AddInstitutionModal.test.tsx
-- [X] T121 [P] [US2] Integration test for GET /api/brokerages endpoint in backend/tests/integration/brokerages.test.ts
+- [ ] T120 [P] [US2] Unit test for AddInstitutionModal component in frontend/tests/unit/AddInstitutionModal.test.tsx
+- [ ] T121 [P] [US2] Integration test for GET /api/brokerages endpoint in backend/tests/integration/brokerages.test.ts
 
 **Checkpoint**: Users can now connect to any of 24+ SnapTrade brokerages, not just the 3 hardcoded ones
 
@@ -254,15 +254,15 @@
 
 ### Tests for User Story 4
 
-- [X] T088 [P] [US4] Unit test for InstitutionFilter component in frontend/tests/unit/InstitutionFilter.test.tsx
+- [ ] T088 [P] [US4] Unit test for InstitutionFilter component in frontend/tests/unit/InstitutionFilter.test.tsx
 
 ### Implementation for User Story 4
 
-- [X] T089 [US4] Add institutionIds query param support to GET /dashboard in backend/src/api/dashboard.ts
-- [X] T090 [US4] Create InstitutionFilter component (checkboxes) in frontend/src/components/dashboard/InstitutionFilter.tsx
-- [X] T091 [US4] Update FilterPanel to include institution checkboxes in frontend/src/components/dashboard/FilterPanel.tsx
-- [X] T092 [US4] Update useDashboard hook to support institution filtering in frontend/src/hooks/useDashboard.ts
-- [X] T093 [US4] Update Dashboard page to wire up institution filter in frontend/src/pages/Dashboard.tsx
+- [ ] T089 [US4] Add institutionIds query param support to GET /dashboard in backend/src/api/dashboard.ts
+- [ ] T090 [US4] Create InstitutionFilter component (checkboxes) in frontend/src/components/dashboard/InstitutionFilter.tsx
+- [ ] T091 [US4] Update FilterPanel to include institution checkboxes in frontend/src/components/dashboard/FilterPanel.tsx
+- [ ] T092 [US4] Update useDashboard hook to support institution filtering in frontend/src/hooks/useDashboard.ts
+- [ ] T093 [US4] Update Dashboard page to wire up institution filter in frontend/src/pages/Dashboard.tsx
 
 **Checkpoint**: Institution filtering complete (Post-MVP feature)
 
